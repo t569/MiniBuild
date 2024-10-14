@@ -2,3 +2,6 @@
 .env
 ./venv
 ./__pycache__
+./results.json
+./src
+./target
