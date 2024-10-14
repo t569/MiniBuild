@@ -1,7 +1,5 @@
 import os
 
-import dotenv
-
 import executefiles
 import readfiles
 from dotenv import dotenv_values
