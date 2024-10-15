@@ -23,7 +23,6 @@ def compile_and_dump(command, json_filename, source_dir, output_dir, files, exec
             'compile_status': '',
             'output': '',
         }
-
         try:
             result = subprocess.run(runcommands, capture_output=True, text=True, check=True)
             print(f"Compilation of {file} successful")
@@ -45,3 +44,38 @@ def compile_and_dump(command, json_filename, source_dir, output_dir, files, exec
     json_file = os.path.join('./', json_filename)
     with open(json_file, 'w') as jsonFile:
         json.dump(compilation_results, jsonFile, indent=4)
+
+
+def helper_parse_lang_type(lang_type, f):
+    for _ in lang_type:
+        if f.endswith('.' + _):
+            return True
+
+    return False
+
+
+def compile_and_dump_dir(command, lang_type, json_filename, source_dir, output_dir, ExecName='a', executeFlag=False):
+    compilation_results = []
+    extension = ''
+    if platform.system() != "Windows":
+        if ExecName == 'a':
+            extension = '.out'
+
+    extension = '.exe'  # will evaluate if we are on windows
+
+    # lang_type is list
+    files_to_compile = [f for f in os.listdir(source_dir) if helper_parse_lang_type(lang_type, f)]
+
+    runcommands = [command]
+    for file in files_to_compile:
+        runcommands.append(os.path.join(output_dir, file))
+
+    runcommands.append('-o')
+    output_binary = os.path.join(output_dir, ExecName)
+    runcommands.append(output_binary)
+
+    result_of_compilation = {
+        'name': [source_dir, ExecName],
+        'compile_link_status': '',
+        'output': '',
+    }
