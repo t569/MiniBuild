@@ -1,18 +1,10 @@
 [
     {
-        "name": [
-            "example.c",
-            "example.exe"
+        "dir": [
+            ".\\\\src\\\\\\Ctest\\",
+            "ctest.exe"
         ],
-        "compile_status": "success",
-        "output": "Hello World!"
-    },
-    {
-        "name": [
-            "example2.c",
-            "example2.exe"
-        ],
-        "compile_status": "success",
-        "output": "Hello World!"
+        "compile_link_status": "success",
+        "output": ""
     }
 ]

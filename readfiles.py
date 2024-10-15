@@ -68,14 +68,36 @@ def compile_and_dump_dir(command, lang_type, json_filename, source_dir, output_d
 
     runcommands = [command]
     for file in files_to_compile:
-        runcommands.append(os.path.join(output_dir, file))
+        runcommands.append(os.path.join(source_dir, file))
 
     runcommands.append('-o')
     output_binary = os.path.join(output_dir, ExecName)
     runcommands.append(output_binary)
 
     result_of_compilation = {
-        'name': [source_dir, ExecName],
+        'dir': [source_dir, ExecName + extension],
         'compile_link_status': '',
         'output': '',
     }
+
+    try:
+        result = subprocess.run(runcommands, capture_output=True, text=True, check=True)
+        print(f"Compilation of {source_dir} successful")
+        result_of_compilation['compile_link_status'] = 'success'
+
+        if executeFlag:
+            result_of_compilation['output'] = executefiles.execute(platform.system(), output_binary)
+
+        else:
+            result_of_compilation['output'] = ''
+
+    except subprocess.CalledProcessError as e:
+        print(f"Error during compilation of {source_dir}")
+        result_of_compilation['compile_link_status'] = 'failure'
+        result_of_compilation['output'] = e.stderr  # capture the error message; Error message of death!!!
+
+    compilation_results.append(result_of_compilation)
+
+    json_file = os.path.join('./', json_filename)
+    with open(json_file, 'w') as jsonFile:
+        json.dump(compilation_results, jsonFile, indent=4)
