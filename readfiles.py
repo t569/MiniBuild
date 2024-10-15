@@ -29,15 +29,19 @@ def compile_and_dump(command, json_filename, source_dir, output_dir, files, exec
             result_of_compilation['compile_status'] = 'success'
 
             if executeFlag:
-                result_of_compilation['output'] = executefiles.execute(platform.system(), output_binary)
+                print(f"Executing {output_binary}...")
+                stdout, stderr = executefiles.execute(platform.system(), output_binary)
+                result_of_compilation['output'] = {"stdout": stdout, "stderr": stderr}
 
             else:
                 result_of_compilation['output'] = ''
 
         except subprocess.CalledProcessError as e:
-            print(f"Error during compilation of {file}")
+            print(f"Error during compilation of {source_file}")
             result_of_compilation['compile_status'] = 'failure'
-            result_of_compilation['output'] = e.stderr  # capture the error message
+
+            result_of_compilation['output'] = {"stdout": e.stdout,
+                                               "stderr": e.stderr}  # capture the error message; Error message of death!!!
 
         compilation_results.append(result_of_compilation)
 
@@ -86,7 +90,9 @@ def compile_and_dump_dir(command, lang_type, json_filename, source_dir, output_d
         result_of_compilation['compile_link_status'] = 'success'
 
         if executeFlag:
-            result_of_compilation['output'] = executefiles.execute(platform.system(), output_binary)
+            print(f"Executing {output_binary}...")
+            stdout, stderr = executefiles.execute(platform.system(), output_binary)
+            result_of_compilation['output'] = {"stdout": stdout, "stderr": stderr}
 
         else:
             result_of_compilation['output'] = ''
@@ -94,7 +100,8 @@ def compile_and_dump_dir(command, lang_type, json_filename, source_dir, output_d
     except subprocess.CalledProcessError as e:
         print(f"Error during compilation of {source_dir}")
         result_of_compilation['compile_link_status'] = 'failure'
-        result_of_compilation['output'] = e.stderr  # capture the error message; Error message of death!!!
+
+        result_of_compilation['output'] = {"stdout": e.stdout, "stderr": e.stderr}  # capture the error message; Error message of death!!!
 
     compilation_results.append(result_of_compilation)
 
