@@ -20,7 +20,7 @@ def changes_attributes(instance, attributes: dict):
 
 
 def lazy_load_func(json_filename) -> list:
-    json_file = os.path.join('../', json_filename)
+    json_file = os.path.join('./', json_filename)
     lazy_load_log = []
     with open(json_file, 'r') as jsonFile:  # read all things that have errors and put them in a list
         intermediate = json.load(jsonFile)

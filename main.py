@@ -13,6 +13,7 @@ cc_command = config['CC_COMMAND']
 output_dir = config['OUTPUT_DIR']
 source_dir = config['SOURCE_DIR']
 json_filename = config['JsonFileName']
+log_file = config['LogDataBase']
 
 c_files = [f for f in os.listdir(source_dir) if f.endswith('.c')]
 cpp_files = [f for f in os.listdir(source_dir) if (f.endswith('.cpp') or f.endswith('.cxx'))]
@@ -20,15 +21,25 @@ cpp_files = [f for f in os.listdir(source_dir) if (f.endswith('.cpp') or f.endsw
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    #executefiles.execute_and_dump(json_filename, output_dir)
     # readfiles.compile_link_and_dump_dir(c_command, 'c', json_filename, source_dir + '\\Ctest\\', output_dir,ExecName='ctest', executeFlag=True)
-    my_first_machine = compile.CompileMachine(cpp_command, json_filename, source_dir, output_dir, 'c++')
-    my_first_machine.compile_and_dump()
-    my_first_machine.compile_and_dump()
+    my_first_machine = compile.CompileMachine(cpp_command, json_filename, log_file,  source_dir, output_dir, 'c++')
     readfiles.change_attribute(my_first_machine, 'lazy_load', True)
-    my_first_machine.compile_and_dump()
-    my_first_machine.compile_and_dump()
-# DONE: implement a lazy load
+    my_first_machine.compile_and_dump_each()
+    my_first_machine.compile_and_dump_each()
+    my_first_machine.compile_and_dump_each()
+    my_first_machine.compile_and_dump_each()
+    my_first_machine.compile_and_dump_each()
+    my_first_machine.compile_and_dump_each()
+    my_first_machine.compile_and_dump_each()
+
+
+
+
+
+
+
+
+
 # TODO: handle the copying of output to test buffer
 # TODO: implement testing
 # TODO: multithreading
