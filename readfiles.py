@@ -28,14 +28,17 @@ class CompileMachine:
             return [f for f in os.listdir(self.source_dir) if (f.endswith('.cpp') or f.endswith('.cxx'))]
 
     def __init__(self, command, json_filename, source_dir, output_dir, file_type, lazy_load=False):
+        self.files = None
         self.command = command
         self.json_filename = json_filename
         self.source_dir = source_dir
         self.output_dir = output_dir
-        self.files = self.files_to_compile(file_type)
+        self.file_type = file_type
         self._number_of_compiles = 0
         if lazy_load:
             self.lazy_load = True
+        else:
+            self.lazy_load = False
 
     def lazy_load_func(self, json_filename) -> list:
         json_file = os.path.join('./', json_filename)
@@ -48,17 +51,17 @@ class CompileMachine:
                     lazy_load_log.append(elem['name'][0])
         return lazy_load_log
 
-    def compile_and_dump(self, executeFlag=False, lazy_load=False):
+    def compile_and_dump(self, executeFlag=False):
         compilation_results = []
         extension = ''
         if platform.system() == "Windows":
             extension = '.exe'
 
         # check if lazy load is active
-        if lazy_load:
-            if self._number_of_compiles > 1:
-                files = self.lazy_load_func(self.json_filename)
-        # note: lazy load should be used only when recompiling as that is when it makes sense
+        if self.lazy_load and self._number_of_compiles > 0:
+            self.files = self.lazy_load_func(self.json_filename)
+        else:
+            self.files = self.files_to_compile(self.file_type)
 
         # compilation process
         for file in self.files:
@@ -97,5 +100,6 @@ class CompileMachine:
         json_file = os.path.join('./', self.json_filename)
         with open(json_file, 'w') as jsonFile:
             json.dump(compilation_results, jsonFile, indent=4)
-
         self._number_of_compiles += 1
+
+
