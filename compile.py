@@ -2,23 +2,8 @@ import platform
 import subprocess
 import os
 import json
-import executefiles
-
-
-# we need to define a class
-
-# this will solve the problem of calling lazy_load on the first execution pipeline
-
-# this function is used to change attributes of the class
-def change_attribute(instance, attribute, new_value):
-    if hasattr(instance, attribute):
-        setattr(instance, attribute, new_value)
-    else:
-        raise ValueError(f'type: {type(instance)} has no attribute: {attribute}')
-def changes_attributes(instance, attributes: dict):
-    for old_attr,new_attr in attributes:
-        setattr(instance, old_attr, new_attr)
-
+from utils import executefiles
+from utils.readfiles import lazy_load_func
 class CompileMachine:
     def files_to_compile(self, filetype):
         if filetype == 'c':
@@ -40,17 +25,6 @@ class CompileMachine:
         else:
             self.lazy_load = False
 
-    def lazy_load_func(self, json_filename) -> list:
-        json_file = os.path.join('./', json_filename)
-        lazy_load_log = []
-        with open(json_file, 'r') as jsonFile:  # read all things that have errors and put them in a list
-            intermediate = json.load(jsonFile)
-
-            for elem in intermediate:
-                if elem['compile_status'] == 'failure':
-                    lazy_load_log.append(elem['name'][0])
-        return lazy_load_log
-
     def compile_and_dump(self, executeFlag=False):
         compilation_results = []
         extension = ''
@@ -59,7 +33,7 @@ class CompileMachine:
 
         # check if lazy load is active
         if self.lazy_load and self._number_of_compiles > 0:
-            self.files = self.lazy_load_func(self.json_filename)
+            self.files = lazy_load_func(self.json_filename)
         else:
             self.files = self.files_to_compile(self.file_type)
 
@@ -76,7 +50,7 @@ class CompileMachine:
                 'output': '',
             }
             try:
-                result = subprocess.run(runcommands, capture_output=True, text=True, check=True)
+                subprocess.run(runcommands, capture_output=True, text=True, check=True)
                 print(f"Compilation of {file} successful")
                 result_of_compilation['compile_status'] = 'success'
 
@@ -92,14 +66,13 @@ class CompileMachine:
                 print(f"Error during compilation of {file}")
                 result_of_compilation['compile_status'] = 'failure'
 
+                # capture the error message; Error message of death!!!
                 result_of_compilation['output'] = {"stdout": e.stdout,
-                                                   "stderr": e.stderr}  # capture the error message; Error message of death!!!
-
+                                                   "stderr": e.stderr}
             compilation_results.append(result_of_compilation)
 
         json_file = os.path.join('./', self.json_filename)
         with open(json_file, 'w') as jsonFile:
             json.dump(compilation_results, jsonFile, indent=4)
         self._number_of_compiles += 1
-
 

@@ -18,7 +18,7 @@ def execute(os_platform, executable_path,extra_args=None):
 
 def execute_and_dump(json_filename, bin_dir):
     # search through the json file
-    json_file = os.path.join('./', json_filename)
+    json_file = os.path.join('../', json_filename)
     os_plat = platform.system()
 
     # execute them and put them in the json file
