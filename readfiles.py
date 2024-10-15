@@ -4,12 +4,28 @@ import os
 import json
 import executefiles
 
+def lazy_load_func(json_filename) -> list:
+    json_file = os.path.join('./', json_filename)
+    lazy_load_log = []
+    with open(json_file, 'r') as jsonFile:  # read all things that have errors and put them in a list
+        intermediate = json.load(jsonFile)
 
-def compile_and_dump(command, json_filename, source_dir, output_dir, files, executeFlag=False):
+        for elem in intermediate:
+            if elem['compile_status'] == 'failure':
+                lazy_load_log.append(elem['name'][0])
+    return lazy_load_log
+
+
+def compile_and_dump(command, json_filename, source_dir, output_dir, files, executeFlag=False, lazy_load=False):
     compilation_results = []
     extension = ''
     if platform.system() == "Windows":
         extension = '.exe'
+
+    # check if lazy load is active
+    if lazy_load:
+        files = lazy_load_func(json_filename)
+    # note: lazy load should be used only when recompiling as that is when it makes sense
 
     # compilation process
     for file in files:
@@ -37,7 +53,7 @@ def compile_and_dump(command, json_filename, source_dir, output_dir, files, exec
                 result_of_compilation['output'] = ''
 
         except subprocess.CalledProcessError as e:
-            print(f"Error during compilation of {source_file}")
+            print(f"Error during compilation of {file}")
             result_of_compilation['compile_status'] = 'failure'
 
             result_of_compilation['output'] = {"stdout": e.stdout,
@@ -50,7 +66,7 @@ def compile_and_dump(command, json_filename, source_dir, output_dir, files, exec
         json.dump(compilation_results, jsonFile, indent=4)
 
 
-def helper_parse_lang_type(lang_type, f):
+def helper_parse_lang_type(lang_type, f) -> bool:
     for _ in lang_type:
         if f.endswith('.' + _):
             return True
@@ -101,7 +117,8 @@ def compile_and_dump_dir(command, lang_type, json_filename, source_dir, output_d
         print(f"Error during compilation of {source_dir}")
         result_of_compilation['compile_link_status'] = 'failure'
 
-        result_of_compilation['output'] = {"stdout": e.stdout, "stderr": e.stderr}  # capture the error message; Error message of death!!!
+        result_of_compilation['output'] = {"stdout": e.stdout,
+                                           "stderr": e.stderr}  # capture the error message; Error message of death!!!
 
     compilation_results.append(result_of_compilation)
 
