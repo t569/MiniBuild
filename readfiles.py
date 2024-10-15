@@ -85,7 +85,7 @@ def compile_and_dump_dir(command, lang_type, json_filename, source_dir, output_d
     }
 
     try:
-        result = subprocess.run(runcommands, capture_output=True, text=True, check=True)
+        subprocess.run(runcommands, capture_output=True, text=True, check=True)
         print(f"Compilation of {source_dir} successful")
         result_of_compilation['compile_link_status'] = 'success'
 
