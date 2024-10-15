@@ -11,7 +11,7 @@ def execute(os_platform, executable_path):
     else:
         execute_result = subprocess.run(['./' + executable_path], capture_output=True, text=True, check=True)
 
-    return execute_result.stdout
+    return execute_result.stdout, execute_result.stderr
 
 
 def execute_and_dump(json_filename, bin_dir,):
@@ -27,12 +27,14 @@ def execute_and_dump(json_filename, bin_dir,):
         for entry in extern_data:
             try:
                 executable_path = os.path.join(bin_dir, (entry.get('name')[1]).split('.')[0])
-                print(f"Executing {executable_path}....")
-                entry['output'] = execute(os_plat, executable_path)
+                if entry.get('compile_status') != 'failure':
+                    print(f"Executing {executable_path}....")
+                    stdout, stderr = execute(os_plat, executable_path)
+                    entry['output'] = {'stdout': stdout, 'stderr': stderr}
 
             except subprocess.CalledProcessError as e:
                 print(f"Error during execution of {executable_path}")
-                entry['output'] = e.stderr  # capture the run time error
+                entry['output'] = {'stdout': e.stdout, 'stderr': e.stderr}  # capture the run time error
 
         print(f"Execution results dumped in {json_file}")
 
@@ -52,12 +54,14 @@ def execute_and_dump_dir(json_filename, bin_dir):
         for entry in extern_data:
             try:
                 executable_path = os.path.join(bin_dir, entry.get('dir')[1].split('.')[0])
-                print(f"Executing {executable_path}....")
-                entry['output'] = execute(os_plat, executable_path)
+                if entry.get('compile_status') != 'failure':
+                    print(f"Executing {executable_path}....")
+                    stdout, stderr = execute(os_plat, executable_path)
+                    entry['output'] = {'stdout': stdout, 'stderr': stderr}
 
             except subprocess.CalledProcessError as e:
                 print(f"Error during execution of {executable_path}")
-                entry['output'] = e.stderr  # capture the run time error
+                entry['output'] = {'stdout': e.stdout, 'stderr': e.stderr}  # capture the run time error
 
         print(f"Execution results in {json_file}")
 

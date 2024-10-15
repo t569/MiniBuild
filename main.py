@@ -19,7 +19,7 @@ cpp_files = [f for f in os.listdir(source_dir) if (f.endswith('.cpp') or f.endsw
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    #readfiles.compile_and_dump(cpp_command, json_filename, source_dir, output_dir, cpp_files,)
-    #executefiles.execute_and_dump(json_filename, output_dir)
-    readfiles.compile_and_dump_dir(cc_command, 'c', json_filename, source_dir + '\\Ctest\\', output_dir, ExecName='ctest')
-    executefiles.execute_and_dump_dir(json_filename, output_dir)
+    readfiles.compile_and_dump(cpp_command, json_filename, source_dir, output_dir, cpp_files,)
+    executefiles.execute_and_dump(json_filename, output_dir)
+    #readfiles.compile_and_dump_dir(cc_command, 'c', json_filename, source_dir + '\\Ctest\\', output_dir, ExecName='ctest')
+    #executefiles.execute_and_dump_dir(json_filename, output_dir)
