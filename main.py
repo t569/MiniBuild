@@ -8,7 +8,7 @@ config = dotenv_values('./.env')
 
 c_command = config['C_COMMAND']
 cpp_command = config['CPP_COMMAND']
-
+cc_command = config['CC_COMMAND']
 output_dir = config['OUTPUT_DIR']
 source_dir = config['SOURCE_DIR']
 json_filename = config['JsonFileName']
