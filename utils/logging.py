@@ -36,6 +36,7 @@ def log_to_file(source_file, dest_file, lazyLoadTag):
         # destination can have something in it, should be included to avoid loss of data
         # if source is something then proceed
 
+        # TODO: FIX THIS LOGGING SYSTEM
         if log_buffer[1]:
             for logs in log_buffer:
                 for log in logs:
