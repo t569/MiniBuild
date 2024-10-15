@@ -25,14 +25,44 @@ def execute_and_dump(json_filename, bin_dir,):
         extern_data = json.load(jsonFile)
 
         for entry in extern_data:
-            executable_path = os.path.join(bin_dir, (entry.get('name')[1]).split('.')[0])
-            entry['output'] = execute(os_plat, executable_path)
+            try:
+                executable_path = os.path.join(bin_dir, (entry.get('name')[1]).split('.')[0])
+                print(f"Executing {executable_path}....")
+                entry['output'] = execute(os_plat, executable_path)
+
+            except subprocess.CalledProcessError as e:
+                print(f"Error during execution of {executable_path}")
+                entry['output'] = e.stderr  # capture the run time error
+
+        print(f"Execution results dumped in {json_file}")
 
     with open(json_file, 'w+') as jsonFile:
         json.dump(extern_data, jsonFile, indent=4)
 
 
+def execute_and_dump_dir(json_filename, bin_dir):
 
+    json_file = os.path.join('./', json_filename)
+    os_plat = platform.system()
+
+    extern_data = []
+    with open(json_file, 'r+') as jsonFile:
+        extern_data = json.load(jsonFile)
+
+        for entry in extern_data:
+            try:
+                executable_path = os.path.join(bin_dir, entry.get('dir')[1].split('.')[0])
+                print(f"Executing {executable_path}....")
+                entry['output'] = execute(os_plat, executable_path)
+
+            except subprocess.CalledProcessError as e:
+                print(f"Error during execution of {executable_path}")
+                entry['output'] = e.stderr  # capture the run time error
+
+        print(f"Execution results in {json_file}")
+
+    with open(json_file, 'w+') as jsonFile:
+        json.dump(extern_data, jsonFile, indent=4)
 
 
 
