@@ -15,8 +15,8 @@ source_dir = config['SOURCE_DIR']
 json_filename = config['JsonFileName']
 log_file = config['LogDataBase']
 
-c_files = [f for f in os.listdir(source_dir) if f.endswith('.c')]
-cpp_files = [f for f in os.listdir(source_dir) if (f.endswith('.cpp') or f.endswith('.cxx'))]
+# c_files = [f for f in os.listdir(source_dir) if f.endswith('.c')]
+# cpp_files = [f for f in os.listdir(source_dir) if (f.endswith('.cpp') or f.endswith('.cxx'))]
 
 
 # Press the green button in the gutter to run the script.
