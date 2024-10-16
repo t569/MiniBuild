@@ -51,4 +51,5 @@ log_file = config['LogDataBase']
 
 if __name__ == "__main__":
     my_first_machine = compile.CompileMachine(cpp_command, json_filename, log_file,  source_dir, output_dir, 'c++')
+    my_first_machine.compile_and_dump_each()
 ```
