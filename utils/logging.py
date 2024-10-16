@@ -10,7 +10,6 @@ import json
 def log_to_file(source_file, dest_file, lazyLoadTag):
     log_buffer: list[list] = []
     final_log: list = []
-    writeFlag: bool = True
     # this is the most difficult
     if lazyLoadTag:
 
