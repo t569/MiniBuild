@@ -15,12 +15,14 @@ def log_to_file(source_file, dest_file, lazyLoadTag):
     if lazyLoadTag:
 
         # read the destination file
-        with open(dest_file, 'r') as read_dest:
+        with open(dest_file, 'r+') as read_dest:
             try:
                 log_buffer.append(json.load(read_dest))
 
-            except:     # error handling
+            except:
+                # dump something if there is nothing there
                 log_buffer.append([])
+                json.dump([], read_dest)
 
 
         # now read the source file
@@ -42,21 +44,18 @@ def log_to_file(source_file, dest_file, lazyLoadTag):
                 for log in logs:
                     final_log.append(log)
 
-
         if final_log:
-            # check if final_log is the same as the value in the file
-            try:
-                with open(dest_file, 'r') as read_dest:
-                    writeFlag = not (final_log == json.load(read_dest))
 
-            except:
-                writeFlag = True # there is nothing in the file, go ahead
+            with open(dest_file, 'r+') as read_write_dest:
+                content = json.load(read_write_dest)
+                if final_log != content:
+                    # overwrite the file
+                    read_write_dest.seek(0)
 
+                    json.dump(final_log, read_write_dest, indent=4)
 
-        if writeFlag:
-            # now if final_log is something we should overwrite the current file
-            with open(dest_file, 'w') as dest_write:
-                json.dump(final_log, dest_write)
+                    read_write_dest.truncate()
+
 
 
 
