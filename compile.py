@@ -47,7 +47,36 @@ class CompileMachine:
         else:
             self.dir_to_executable = False
 
-    def compile_and_dump_exec_each(self, executeFlag=False):
+    @classmethod
+    def use_config(cls, json_file):
+        with open(json_file, 'r') as config_file:
+            try:
+                config_dict = json.load(config_file)
+            except Exception as e:
+                print(f"Error reading config file:{json_file}\n Error: {e}")
+
+        try:
+            return cls(
+                command=config_dict.get('command'),
+                json_filename=config_dict.get('json_filename'),
+                log_file=config_dict.get('log_file'),
+                source_dir=config_dict.get('source_dir'),
+                output_dir=config_dict.get('output_dir'),
+                file_type=config_dict.get('file_type'),
+                lazy_load=config_dict.get('lazy_load'),
+                compile_dir_to_executable=config_dict.get('compile_dir_to_executable'),
+            )
+
+        except json.JSONDecodeError:
+            print(f"Error: The file '{json_file}' is not a valid JSON file")
+
+        except FileNotFoundError:
+            print(f"Error: the file '{json_file}; was not found ")
+
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
+    def __compile_and_dump_exec_each(self, executeFlag=False):
         compilation_results = []
         extension = ''
         if self.os_type == "Windows":
@@ -86,7 +115,7 @@ class CompileMachine:
         # logging logic
         log_to_file(json_file, self.log_file, self.lazy_load)
 
-    def compile_and_dump_exec_dir(self, executeFlag=False, ExecName='a'):
+    def __compile_and_dump_exec_dir(self, executeFlag=False, ExecName='a'):
         compilation_results = []
         extension = ''
         if self.os_type != "Windows":
@@ -135,8 +164,7 @@ class CompileMachine:
     def compile_and_dump_exec(self, compile_dir_to_executable: typing.Union[str, bool] = False, executeFlag=False):
 
         if compile_dir_to_executable:
-            self.compile_and_dump_exec_dir(executeFlag=executeFlag, ExecName=compile_dir_to_executable)
+            self.__compile_and_dump_exec_dir(executeFlag=executeFlag, ExecName=compile_dir_to_executable)
 
         else:
-            self.compile_and_dump_exec_each(executeFlag=executeFlag)
-
+            self.__compile_and_dump_exec_each(executeFlag=executeFlag)
