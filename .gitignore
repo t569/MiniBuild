@@ -6,3 +6,4 @@
 ./src
 ./target
 ./src/.vscode
+buildconfig.json
