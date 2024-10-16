@@ -76,7 +76,7 @@ class CompileMachine:
         except Exception as e:
             print(f"An error occurred: {e}")
 
-    def __compile_and_dump_exec_each(self, executeFlag=False):
+    def __compile_and_dump_exec_each(self, executeFlag=False,extra_run_args=None):
         compilation_results = []
         extension = ''
         if self.os_type == "Windows":
@@ -103,7 +103,8 @@ class CompileMachine:
                                             results=result_of_compilation,
                                             file_to_compile=file,
                                             output_bin=output_binary,
-                                            os_type=self.os_type)
+                                            os_type=self.os_type,
+                                            extra_run_args=extra_run_args)
 
             compilation_results.append(result_of_compilation)
 
@@ -115,7 +116,7 @@ class CompileMachine:
         # logging logic
         log_to_file(json_file, self.log_file, self.lazy_load)
 
-    def __compile_and_dump_exec_dir(self, executeFlag=False, ExecName='a'):
+    def __compile_and_dump_exec_dir(self, executeFlag=False,extra_run_args=None, ExecName='a'):
         compilation_results = []
         extension = ''
         if self.os_type != "Windows":
@@ -148,7 +149,8 @@ class CompileMachine:
                                         file_to_compile=self.source_dir,
                                         os_type=self.os_type,
                                         results=result_of_compilation,
-                                        output_bin=output_binary)
+                                        output_bin=output_binary,
+                                        extra_run_args=extra_run_args)
 
         compilation_results.append(result_of_compilation)
 
@@ -161,10 +163,10 @@ class CompileMachine:
         # logging logic
         log_to_file(json_file, self.log_file, self.lazy_load)
 
-    def compile_and_dump_exec(self, compile_dir_to_executable: typing.Union[str, bool] = False, executeFlag=False):
+    def compile_and_dump_exec(self, compile_dir_to_executable: typing.Union[str, bool] = False, executeFlag=False, extra_run_args=None):
 
         if compile_dir_to_executable:
-            self.__compile_and_dump_exec_dir(executeFlag=executeFlag, ExecName=compile_dir_to_executable)
+            self.__compile_and_dump_exec_dir(executeFlag=executeFlag, ExecName=compile_dir_to_executable, extra_run_args=extra_run_args)
 
         else:
-            self.__compile_and_dump_exec_each(executeFlag=executeFlag)
+            self.__compile_and_dump_exec_each(executeFlag=executeFlag, extra_run_args=extra_run_args)
