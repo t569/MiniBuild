@@ -33,12 +33,13 @@ def log_to_file(source_file, dest_file, lazyLoadTag):
             except:
                 log_buffer.append([])
 
-
+        """
         # now combine the source and destination
         # destination can have something in it, should be included to avoid loss of data
         # if source is something then proceed
+        """
 
-        # TODO: FIX THIS LOGGING SYSTEM
+        # TODO: MODIFY WHAT SHOULD BE LOGGED
         if log_buffer[1]:
             for logs in log_buffer:
                 for log in logs:
