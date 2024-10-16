@@ -50,14 +50,16 @@ json_filename = config['JsonFileName']
 log_file = config['LogDataBase']
 
 if __name__ == "__main__":
-    my_first_machine = compile.CompileMachine(cpp_command, json_filename, log_file,  source_dir, output_dir, 'c++')
-    my_first_machine.compile_and_dump_each()
+    my_first_machine = compile.CompileMachine(cpp_command, json_filename,
+                                              log_file,  source_dir,
+                                              output_dir, file_type='c++')
+    my_first_machine.compile_and_dump_exec()
 ```
 
 # Execution
 To modify the file and allow execution of the compiled code, change the last line to the following:
 ```python
-my_first_machine.compile_and_dump_each(executeFlag=True)
+my_first_machine.compile_and_dump_exec(executeFlag=True)
 ```
 
 
