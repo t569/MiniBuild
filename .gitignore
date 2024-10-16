@@ -5,3 +5,4 @@
 ./results.json
 ./src
 ./target
+./src/.vscode
