@@ -4,15 +4,19 @@ import subprocess
 import json
 
 
-def execute(os_platform, executable_path,extra_args=None):
+def execute(os_platform, executable_path, extra_args=None):
 
     if extra_args is None:
         extra_args = []
     if os_platform == "Windows":
-        execute_result = subprocess.run([executable_path + '.exe'] + extra_args, capture_output=True, text=True, check=True)
+        execute_result = subprocess.run([executable_path + '.exe'] + extra_args,
+                                        capture_output=True,
+                                        text=True, check=True)
 
     else:
-        execute_result = subprocess.run(['./' + executable_path] + extra_args, capture_output=True, text=True, check=True)
+        execute_result = subprocess.run(['./' + executable_path] + extra_args,
+                                        capture_output=True,
+                                        text=True, check=True)
     return execute_result.stdout, execute_result.stderr
 
 
