@@ -28,6 +28,8 @@ if __name__ == '__main__':
     readfiles.change_attribute(my_first_machine, 'file_type', 'c')
     my_first_machine.compile_and_dump_exec(compile_dir_to_executable='ctest', executeFlag=True)
 
+    my_second_machine = compile.CompileMachine.use_config('buildconfig.json')
+    my_second_machine.compile_and_dump_exec()
 
 
 

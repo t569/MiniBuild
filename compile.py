@@ -57,14 +57,14 @@ class CompileMachine:
 
         try:
             return cls(
-                command=config_dict.get('command'),
-                json_filename=config_dict.get('json_filename'),
-                log_file=config_dict.get('log_file'),
-                source_dir=config_dict.get('source_dir'),
-                output_dir=config_dict.get('output_dir'),
-                file_type=config_dict.get('file_type'),
-                lazy_load=config_dict.get('lazy_load'),
-                compile_dir_to_executable=config_dict.get('compile_dir_to_executable'),
+                command=config_dict[0]['command'],
+                json_filename=config_dict[0]['json_filename'],
+                log_file=config_dict[0]['log_file'],
+                source_dir=config_dict[0]['source_dir'],
+                output_dir=config_dict[0]['output_dir'],
+                file_type=config_dict[0]['file_type'],
+                lazy_load=config_dict[0]['lazy_load'],
+                compile_dir_to_executable=config_dict[0]['compile_dir_to_executable']
             )
 
         except json.JSONDecodeError:
