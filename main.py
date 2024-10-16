@@ -21,20 +21,17 @@ log_file = config['LogDataBase']
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    # readfiles.compile_link_and_dump_dir(c_command, 'c', json_filename, source_dir + '\\Ctest\\', output_dir,ExecName='ctest', executeFlag=True)
-    my_first_machine = compile.CompileMachine(cpp_command, json_filename, log_file,  source_dir, output_dir, 'c++')
-    my_first_machine.compile_and_dump_each(executeFlag=True)
+    my_first_machine = compile.CompileMachine(cpp_command, json_filename,
+                                              log_file,  source_dir,
+                                              output_dir, file_type='c++')
+    readfiles.change_attribute(my_first_machine, 'source_dir', source_dir + '\\Ctest\\')
+    readfiles.change_attribute(my_first_machine, 'file_type', 'c')
+    my_first_machine.compile_and_dump_exec(compile_dir_to_executable='ctest', executeFlag=True)
 
 
 
 
 
-
-
-
-
-
-# DONE: handle the copying of output to test buffer
 # TODO: handle inputs
 # TODO: implement testing
 # TODO: multithreading

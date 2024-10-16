@@ -1,5 +1,7 @@
 import os
 import json
+import subprocess
+from . import executefiles
 
 
 # we need to define a class
@@ -30,3 +32,28 @@ def lazy_load_func(json_filename) -> list:
                 lazy_load_log.append(elem['name'][0])
     return lazy_load_log
 
+
+def compile(runcommands, execute, results, file_to_compile, output_bin, os_type) -> list:
+    try:
+        subprocess.run(runcommands, capture_output=True, text=True, check=True)
+        print(f"Compilation of {file_to_compile} successful")
+        results['compile_status'] = 'success'
+
+        if execute:
+            print(f"Executing {output_bin}...")
+            stdout, stderr = executefiles.execute(os_type, output_bin)
+            results['output'] = {"stdout": stdout, "stderr": stderr}
+
+        else:
+            results['output'] = ''
+
+    except subprocess.CalledProcessError as e:
+        print(f"Error during compilation of {file_to_compile}")
+        results['compile_status'] = 'failure'
+
+        # capture the error message; Error message of death!!!
+        results['output'] = {"stdout": e.stdout,
+                             "stderr": e.stderr}
+
+    finally:
+        return results
