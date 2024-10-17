@@ -190,13 +190,11 @@ class CompileMachine:
         runcommands.append(output_binary)
         # end file append logic
 
-        print(files_to_compile)
         result_of_compilation = {
             'dir': [self.source_dir, ExecName + extension],
             'compile_status': '',
             'output': '',
         }
-        print(runcommands)
         # check if lazy load is active
         self.lazy_load_check_and_handle()
 
@@ -274,3 +272,7 @@ class CompileMachine:
 
         # logging logic
         log_to_file(json_file, self.log_file, self.lazy_load)
+
+
+    def link_to_dir(self, source_dir_of_object_files, target_dir_for_executable,ExecName='a'):
+        pass

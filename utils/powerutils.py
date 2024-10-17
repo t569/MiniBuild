@@ -62,3 +62,5 @@ def compile(runcommands, execute, results, file_to_compile, output_bin, os_type,
         return results
 
 
+def link(runcommands, execute,files_to_link, output_bin, os_type):
+    pass

@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
     my_fourth_machine = build.CompileMachine(c_command, result_file, log_file, source_dir, output_dir, file_type='c',
                                              recursive_compile_dir=True)
-    readfiles.change_attribute(my_fourth_machine, 'output_dir', output_dir_object_files)
+    powerutils.change_attribute(my_fourth_machine, 'output_dir_objectfiles', output_dir_object_files)
     my_fourth_machine.compile_to_obj_and_dump()
 
 
