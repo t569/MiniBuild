@@ -110,7 +110,10 @@ class CompileMachine:
                 output_dir=config_dict[0]['output_dir'],
                 file_type=config_dict[0]['file_type'],
                 lazy_load=config_dict[0]['lazy_load'],
-                compile_dir_to_executable=config_dict[0]['compile_dir_to_executable']
+                compile_dir_to_executable=config_dict[0]['compile_dir_to_executable'],
+                output_dir_objectfiles=config_dict[0]['output_dir_objectfiles'],
+                output_dir_executables=config_dict[0]['output_dir_executables'],
+                recursive_compile_dir=config_dict[0]['recursive_compile_dir']
             )
 
         except json.JSONDecodeError:
