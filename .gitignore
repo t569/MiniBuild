@@ -2,7 +2,7 @@
 .env
 ./venv
 ./__pycache__
-./results.json
+logs/results.json
 ./src
 ./target
 ./src/.vscode

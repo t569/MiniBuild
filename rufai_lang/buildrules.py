@@ -48,7 +48,7 @@ def resolve_all_imports():
 
 
 def execute_build_box_rule(dictionary_of_args):
-    replace_list = []
+    replace_list:list = []
     # change alot of the boilerplate code
     replace_list.append("utils")
     replace_list.append('.')

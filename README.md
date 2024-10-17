@@ -27,11 +27,12 @@ You can replace the various commands and paths with custom paths and files in th
 you can install the venv as you please
 ## Config : Load Your variables
 Create a main script and add the following:
+
 ```python
 
 from dotenv import dotenv_values
 
-import compile
+import build
 from utils import readfiles
 
 config = dotenv_values('./.env')

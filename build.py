@@ -5,28 +5,58 @@ import typing
 from utils.readfiles import lazy_load_func
 from utils.readfiles import compile
 from utils.logging import log_to_file
-
 # redundant lol
 from main import cc_command
 
 
+# please if you are reading this code to understand, start from here and the function compile_and_dump_exec
 class CompileMachine:
     def lazy_load_check_and_handle(self):
         if self.lazy_load and self._number_of_compiles > 0:
             self.files = lazy_load_func(self.json_filename)
             print(f"Lazy load activated for compilation...")
         else:
-            self.files = self.files_to_compile(self.file_type)
+            self.files = self.files_to_compile(self.file_type, recursive_compile_dir=self.recursive_compile_dir)
 
-    def files_to_compile(self, filetype):
+    def resolve_dir(self, directory_name: str, file_types: list) -> [str]:
+
+        output_list: list = []
+        # list all the files in a dir
+        for i in os.listdir(directory_name):
+            absolute_i_path = os.path.join(directory_name, i)
+            if os.path.isfile(absolute_i_path):  # if it is a file and it matches the file type
+                if self.is_filetype(file_types, absolute_i_path):
+                    output_list.append(absolute_i_path)
+
+            else:  # else it is a directory
+                # ignore .folder folders
+                if i[0] == '.':
+                    continue
+                output_list.extend(self.resolve_dir(absolute_i_path + "\\\\", file_types))
+        return output_list
+
+    def is_filetype(self, filetype: list[str], file: str):
+        for extension in filetype:
+            if file.endswith(extension):
+                return True
+        return False
+
+    def files_to_compile(self, filetype, recursive_compile_dir):
+        extensions = []
+
         if filetype == 'c':
-            return [f for f in os.listdir(self.source_dir) if f.endswith('.c')]
-
+            extensions = ['.c']
         elif filetype == 'c++':
-            return [f for f in os.listdir(self.source_dir) if (f.endswith('.cpp') or f.endswith('.cxx'))]
+            extensions = ['.cpp', '.cxx']
+
+        if recursive_compile_dir:
+            return self.resolve_dir(self.source_dir, extensions)
+
+        else:
+            return [f for f in os.listdir(self.source_dir) if self.is_filetype(extensions, f)]
 
     def __init__(self, command, json_filename, log_file, source_dir, output_dir, file_type, lazy_load=False,
-                 compile_dir_to_executable=False):
+                 compile_dir_to_executable=False, recursive_compile_dir=False, output_dir_executables=None, output_dir_objectfiles=None):
         self.files = None
         self.command = command
         self.multi_command = cc_command
@@ -46,6 +76,22 @@ class CompileMachine:
             self.dir_to_executable = True
         else:
             self.dir_to_executable = False
+
+        # note this flag only works for compile_and_dump_exec_dir
+        if recursive_compile_dir:
+            self.recursive_compile_dir = True
+        else:
+            self.recursive_compile_dir = False
+
+        if output_dir_executables is None:
+            self.output_dir_executables = output_dir
+        else:
+            self.output_dir_executables = output_dir_executables
+        if output_dir_objectfiles is None:
+            self.output_dir_objectfiles = output_dir
+        else:
+            self.output_dir_objectfiles = output_dir_objectfiles
+
 
     @classmethod
     def use_config(cls, json_file):
@@ -76,7 +122,7 @@ class CompileMachine:
         except Exception as e:
             print(f"An error occurred: {e}")
 
-    def __compile_and_dump_exec_each(self, executeFlag=False,extra_run_args=None):
+    def __compile_and_dump_exec_each(self, executeFlag=False, extra_run_args=None):
         compilation_results = []
         extension = ''
         if self.os_type == "Windows":
@@ -116,7 +162,7 @@ class CompileMachine:
         # logging logic
         log_to_file(json_file, self.log_file, self.lazy_load)
 
-    def __compile_and_dump_exec_dir(self, executeFlag=False,extra_run_args=None, ExecName='a'):
+    def __compile_and_dump_exec_dir(self, executeFlag=False, extra_run_args=None, ExecName='a'):
         compilation_results = []
         extension = ''
         if self.os_type != "Windows":
@@ -126,21 +172,27 @@ class CompileMachine:
         extension = '.exe'  # will evaluate if we are on windows
 
         # lang_type is list
-        files_to_compile = self.files_to_compile(filetype=self.file_type)
+        files_to_compile = self.files_to_compile(filetype=self.file_type,
+                                                 recursive_compile_dir=self.recursive_compile_dir)
         runcommands = [self.multi_command]
+
+        # file append logic: logic for listing files to be compiled
         for file in files_to_compile:
             runcommands.append(os.path.join(self.source_dir, file))
 
         runcommands.append('-o')
+
         # the actual file being spat out
         output_binary = os.path.join(self.output_dir, ExecName)
         runcommands.append(output_binary)
+        # end file append logic
 
         result_of_compilation = {
             'dir': [self.source_dir, ExecName + extension],
-            'compile_link_status': '',
+            'compile_status': '',
             'output': '',
         }
+
         # check if lazy load is active
         self.lazy_load_check_and_handle()
 
@@ -164,10 +216,57 @@ class CompileMachine:
         # logging logic
         log_to_file(json_file, self.log_file, self.lazy_load)
 
-    def compile_and_dump_exec(self, compile_dir_to_executable: typing.Union[str, bool] = False, executeFlag=False, extra_run_args=None):
+    def compile_and_dump_exec(self, compile_dir_to_executable: typing.Union[str, bool] = False, executeFlag=False,
+                              extra_run_args=None):
 
         if compile_dir_to_executable:
-            self.__compile_and_dump_exec_dir(executeFlag=executeFlag, ExecName=compile_dir_to_executable, extra_run_args=extra_run_args)
+            self.__compile_and_dump_exec_dir(executeFlag=executeFlag, ExecName=compile_dir_to_executable,
+                                             extra_run_args=extra_run_args)
 
         else:
             self.__compile_and_dump_exec_each(executeFlag=executeFlag, extra_run_args=extra_run_args)
+
+    def compile_to_obj_and_dump(self):
+        # by default recursive_compile_dir should be used; not too important sha
+        compilation_results = []
+        extension = '.o'
+
+        self.lazy_load_check_and_handle()  # handle lazy loading as usual
+
+        # create all the object files, make them recursive if we are using recursive compile
+        files_to_compile_list = self.files_to_compile(filetype=self.file_type,
+                                                      recursive_compile_dir=self.recursive_compile_dir)
+
+        # implement the commands
+
+        for file in files_to_compile_list:
+            commands: list = [self.command, '-c']
+            file_parse = file.split('\\')
+            commands.append(file)
+            # very disgusting parsing lol
+            object_file = (file_parse[len(file_parse) - 1]).split('.')[0] + extension
+            commands.append('-o')
+            commands.append(self.output_dir + object_file)
+            result_of_compilation = {
+                'name': [file, object_file],
+                'compile_status': '',
+                'output': '',
+            }
+            # execute is ALWAYS False and extra_run_args is ALWAYS None
+            result_of_compilation = compile(runcommands=commands,
+                                            execute=False,
+                                            results=result_of_compilation,
+                                            file_to_compile=file,
+                                            output_bin=object_file,
+                                            os_type=self.os_type,
+                                            extra_run_args=None)
+
+            compilation_results.append(result_of_compilation)
+
+        json_file = os.path.join('./', self.json_filename)
+        with open(json_file, 'w') as jsonFile:
+            json.dump(compilation_results, jsonFile, indent=4)
+        self._number_of_compiles += 1
+
+        # logging logic
+        log_to_file(json_file, self.log_file, self.lazy_load)
