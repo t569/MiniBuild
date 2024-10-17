@@ -92,7 +92,7 @@ def clean_macros(macros_to_expand):
         clean_macros_list.append([call_command_rule(command[0], commands_to_parse, command[1]), macro[1]])
 
     return clean_macros_list
-        # TODO: parse the clean_macro_list properly: cannot handle lists
+        
 
 clean_macros_list = clean_macros(macros_to_expand)
 
