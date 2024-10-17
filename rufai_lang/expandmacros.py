@@ -6,7 +6,8 @@ from buildrules import *
 # the command and the rule
 
 commands_to_parse = {
-    '~init_build_box': init_build_box_rule,
+    '~init_build_box':  init_build_box_rule,
+    '~compile_build_box':   compile_build_box_rule,
 }
 
 macro_file_name = "rufai.txt"
@@ -32,7 +33,6 @@ def collect_macros(file_txt):
 
     return to_expand
 
-
 def handle_macros_errors(macro):
     count = 0
     for char in macro[0]:
@@ -45,7 +45,6 @@ def handle_macros_errors(macro):
 
 
 macros_to_expand = collect_macros(output)
-
 
 # clean up the file
 def split_macros(macro_instance):
@@ -74,29 +73,28 @@ def split_macros(macro_instance):
 def clean_macros(macros_to_expand):
     clean_macros_list = []
     for macro in macros_to_expand:
+
         # first handle the errors
         handle_macros_errors(macro)
         command = split_macros(macro[0])  # macro[1] is the line number
         clean_macros_list.append([call_command_rule(command[0], commands_to_parse, command[1]), macro[1]])
-        # parse the file into command and args
 
-        return clean_macros_list
+    return clean_macros_list
+        # TODO: parse the clean_macro_list properly
 
-
-print(macros_to_expand)
 clean_macros_list = clean_macros(macros_to_expand)
+
 
 # finally, write these lines back to the txt
 # open the file and read it
 with open(target_file_dir + macro_file_name, 'r') as macro_file:
     lines_read = macro_file.readlines()
 
-print(lines_read)
 
 for items in clean_macros_list:
     # modify the lines in lines_read
     lines_read[items[1] - 1] = ''.join(items[0])
-    print(lines_read)
+
 
 # all that is left is to dump all this rubbish into a python file
 with open(target_file_dir + target_file_executables_dir + macro_file_name.split('.')[0] + '.py', 'w') as python_file:

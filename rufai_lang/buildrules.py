@@ -10,3 +10,20 @@ def init_build_box_rule(dictionary_of_args):
     # TODO: resolve relative path of import later
 
     return replace_list
+
+
+def compile_build_box_rule(dictionary_of_args):
+    replace_list = []
+    replace_list.append(dictionary_of_args['name'])
+    replace_list.append(".")
+    replace_list.append("compile_and_dump_exec")
+    replace_list.append("(")
+    replace_list.append("compile_dir_to_executable")
+    replace_list.append(" = ")
+    if not dictionary_of_args['dir_to_exec']:   # dir_to_exec is false
+        replace_list.append(dictionary_of_args['dir_to_exec'])
+    else:
+        replace_list.append(f"'{dictionary_of_args['dir_to_exec']}'")
+    replace_list.append(")")
+
+    return replace_list
