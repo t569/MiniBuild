@@ -4,7 +4,7 @@ from dotenv import dotenv_values
 
 import build
 import utils.executefiles
-from utils import readfiles
+from utils import powerutils
 
 config = dotenv_values('./.env')
 
@@ -15,13 +15,13 @@ output_dir = config['OUTPUT_DIR']
 output_dir_executables = config['OUTPUT_DIR'] + config['EXECUTABLES_DIR']
 output_dir_object_files = config['OUTPUT_DIR'] + config['OBJECTFILES_DIR']
 source_dir = config['SOURCE_DIR']
-json_filename = config['RESULT_JSON_FILE']
+result_file = config['RESULT_JSON_FILE']
 log_file = config['LOG_DATABASE']
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     """
-    my_first_machine = build.CompileMachine(cpp_command, json_filename,
+    my_first_machine = build.CompileMachine(cpp_command, result_file,
                                             log_file, source_dir,
                                             output_dir, file_type='c++', lazy_load=True)
     readfiles.change_attribute(my_first_machine, 'source_dir', source_dir + '\\Ctest\\')
@@ -35,10 +35,14 @@ if __name__ == '__main__':
     print(my_first_machine.lazy_load)
 
     # compile_dir_to_executable not logging properly
-     my_third_machine = build.CompileMachine.use_config('buildconfig.json')
+     
     """
+    my_third_machine = build.CompileMachine.use_config('buildconfig.json')
+    my_third_machine.compile_and_dump_exec(compile_dir_to_executable='kome')
 
-    my_fourth_machine = build.CompileMachine(c_command, json_filename, log_file, source_dir, output_dir, file_type='c',recursive_compile_dir=True)
+
+    my_fourth_machine = build.CompileMachine(c_command, result_file, log_file, source_dir, output_dir, file_type='c',
+                                             recursive_compile_dir=True)
     readfiles.change_attribute(my_fourth_machine, 'output_dir', output_dir_object_files)
     my_fourth_machine.compile_to_obj_and_dump()
 

@@ -2,8 +2,8 @@ import platform
 import os
 import json
 import typing
-from utils.readfiles import lazy_load_func
-from utils.readfiles import compile
+from utils.powerutils import lazy_load_func
+from utils.powerutils import compile
 from utils.logging import log_to_file
 # redundant lol
 from main import cc_command
@@ -32,7 +32,7 @@ class CompileMachine:
                 # ignore .folder folders
                 if i[0] == '.':
                     continue
-                output_list.extend(self.resolve_dir(absolute_i_path + "\\\\", file_types))
+                output_list.extend(self.resolve_dir(absolute_i_path + '/', file_types))
         return output_list
 
     def is_filetype(self, filetype: list[str], file: str):
@@ -55,12 +55,12 @@ class CompileMachine:
         else:
             return [f for f in os.listdir(self.source_dir) if self.is_filetype(extensions, f)]
 
-    def __init__(self, command, json_filename, log_file, source_dir, output_dir, file_type, lazy_load=False,
+    def __init__(self, command, result_file, log_file, source_dir, output_dir, file_type, lazy_load=False,
                  compile_dir_to_executable=False, recursive_compile_dir=False, output_dir_executables=None, output_dir_objectfiles=None):
         self.files = None
         self.command = command
         self.multi_command = cc_command
-        self.json_filename = json_filename
+        self.json_filename = result_file
         self.source_dir = source_dir
         self.output_dir = output_dir
         self.file_type = file_type
@@ -104,15 +104,15 @@ class CompileMachine:
         try:
             return cls(
                 command=config_dict[0]['command'],
-                json_filename=config_dict[0]['json_filename'],
+                result_file=config_dict[0]['result_file'],
                 log_file=config_dict[0]['log_file'],
                 source_dir=config_dict[0]['source_dir'],
                 output_dir=config_dict[0]['output_dir'],
                 file_type=config_dict[0]['file_type'],
                 lazy_load=config_dict[0]['lazy_load'],
                 compile_dir_to_executable=config_dict[0]['compile_dir_to_executable'],
-                output_dir_objectfiles=config_dict[0]['output_dir_objectfiles'],
-                output_dir_executables=config_dict[0]['output_dir_executables'],
+                output_dir_objectfiles=config_dict[0]['output_dir'] + config_dict[0]['output_dir_objectfiles'],
+                output_dir_executables=config_dict[0]['output_dir'] + config_dict[0]['output_dir_executables'],
                 recursive_compile_dir=config_dict[0]['recursive_compile_dir']
             )
 
@@ -137,7 +137,7 @@ class CompileMachine:
         # compilation process
         for file in self.files:
             source_file = os.path.join(self.source_dir, file)
-            output_binary = os.path.join(self.output_dir, file.split('.')[0])
+            output_binary = os.path.join(self.output_dir_executables, file.split('.')[0])
 
             runcommands = [self.command, source_file, '-o', output_binary]
 
@@ -186,16 +186,17 @@ class CompileMachine:
         runcommands.append('-o')
 
         # the actual file being spat out
-        output_binary = os.path.join(self.output_dir, ExecName)
+        output_binary = os.path.join(self.output_dir_executables, ExecName)
         runcommands.append(output_binary)
         # end file append logic
 
+        print(files_to_compile)
         result_of_compilation = {
             'dir': [self.source_dir, ExecName + extension],
             'compile_status': '',
             'output': '',
         }
-
+        print(runcommands)
         # check if lazy load is active
         self.lazy_load_check_and_handle()
 
@@ -244,7 +245,7 @@ class CompileMachine:
 
         for file in files_to_compile_list:
             commands: list = [self.command, '-c']
-            file_parse = file.split('\\')
+            file_parse = file.split('/')
             commands.append(file)
             # very disgusting parsing lol
             object_file = (file_parse[len(file_parse) - 1]).split('.')[0] + extension
