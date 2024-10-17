@@ -2,7 +2,7 @@ import os
 
 from dotenv import dotenv_values
 
-import compile
+import build
 import utils.executefiles
 from utils import readfiles
 
@@ -22,17 +22,18 @@ log_file = config['LogDataBase']
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    my_first_machine = compile.CompileMachine(cpp_command, json_filename,
+    my_first_machine = build.CompileMachine(cpp_command, json_filename,
                                               log_file,  source_dir,
                                               output_dir, file_type='c++')
     readfiles.change_attribute(my_first_machine, 'source_dir', source_dir + '\\Ctest\\')
     readfiles.change_attribute(my_first_machine, 'file_type', 'c')
     my_first_machine.compile_and_dump_exec(compile_dir_to_executable='ctest', executeFlag=True)
 
-    my_second_machine = compile.CompileMachine.use_config('buildconfig.json')
+    my_second_machine = build.CompileMachine.use_config('buildconfig.json')
     my_second_machine.compile_and_dump_exec()
     utils.executefiles.execute(executable_path=my_second_machine.output_dir,os_platform=my_second_machine.os_type, extra_args=None)
 
+# TODO: resolve the import/copying of the rufai lang file content
 # TODO: implement testing
 # TODO: multithreading
 
