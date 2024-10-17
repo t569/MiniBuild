@@ -3,6 +3,7 @@ import os
 from dotenv import dotenv_values
 
 import compile
+import utils.executefiles
 from utils import readfiles
 
 config = dotenv_values('./.env')
@@ -30,6 +31,7 @@ if __name__ == '__main__':
 
     my_second_machine = compile.CompileMachine.use_config('buildconfig.json')
     my_second_machine.compile_and_dump_exec()
+    utils.executefiles.execute(executable_path=my_second_machine.output_dir,os_platform=my_second_machine.os_type, extra_args=None)
 
 # TODO: implement testing
 # TODO: multithreading

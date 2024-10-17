@@ -1,6 +1,7 @@
 # this is the first file in my mini macro system for python build system MiniBuild!!!!!!!
 import os
 import re
+import ast
 from buildrules import *
 
 # the command and the rule
@@ -8,6 +9,7 @@ from buildrules import *
 commands_to_parse = {
     '~init_build_box':  init_build_box_rule,
     '~compile_build_box':   compile_build_box_rule,
+    '~execute_build_box':   execute_build_box_rule,
 }
 
 macro_file_name = "rufai.txt"
@@ -59,11 +61,21 @@ def split_macros(macro_instance):
         args = {}
 
         if args_and_flags:
-            for arg in args_and_flags.split(','):
-                key_value = arg.split('=')
-                if len(key_value) == 2:
-                    key, value = key_value[0].strip(), key_value[1].strip()
-                    args[key] = value
+
+            # match key value pairs also allows nested structures
+            key_value_pattern = r'(?P<key>\w+)\s*=\s*(?P<value>.+?)(?=,\s*\w+=|$)'
+            for kv_match in re.finditer(key_value_pattern, args_and_flags):
+                key_value = kv_match.group('key').strip()
+                value = kv_match.group('value').strip()
+
+                # evaluate all the python literals with ast
+                try:
+                    value = ast.literal_eval(value)
+
+                except (ValueError, SyntaxError):
+                    # if we can't evaluate value keep it as string
+                    pass
+                args[key_value] = value
 
         return command_name, args
     else:
@@ -80,7 +92,7 @@ def clean_macros(macros_to_expand):
         clean_macros_list.append([call_command_rule(command[0], commands_to_parse, command[1]), macro[1]])
 
     return clean_macros_list
-        # TODO: parse the clean_macro_list properly
+        # TODO: parse the clean_macro_list properly: cannot handle lists
 
 clean_macros_list = clean_macros(macros_to_expand)
 
@@ -93,7 +105,8 @@ with open(target_file_dir + macro_file_name, 'r') as macro_file:
 
 for items in clean_macros_list:
     # modify the lines in lines_read
-    lines_read[items[1] - 1] = ''.join(items[0])
+    lines_read[items[1] - 1] = ''.join(str(item) for item in items[0])
+
 
 
 # all that is left is to dump all this rubbish into a python file

@@ -132,6 +132,7 @@ class CompileMachine:
             runcommands.append(os.path.join(self.source_dir, file))
 
         runcommands.append('-o')
+        # the actual file being spat out
         output_binary = os.path.join(self.output_dir, ExecName)
         runcommands.append(output_binary)
 

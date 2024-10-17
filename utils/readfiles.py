@@ -39,6 +39,8 @@ def compile(runcommands, execute, results, file_to_compile, output_bin, os_type,
         print(f"Compilation of {file_to_compile} successful")
         results['compile_status'] = 'success'
 
+        # output_bin = output_dir + file
+
         if execute:
             print(f"Executing {output_bin}...")
             stdout, stderr = executefiles.execute(os_type, output_bin, extra_run_args)
