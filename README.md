@@ -6,15 +6,17 @@ There is a need for config to get the system to work
 
 # Config
 For the basic create a .env file in the build directory after pulling the repo and specify the following:
-```
-C_COMMAND = gcc
-CPP_COMMAND = g++
-CC_COMMAND = cc
+```dotenv
+C_COMMAND=gcc
+CPP_COMMAND=g++
+CC_COMMAND=cc
 
-OUTPUT_DIR = .\\target\\
-SOURCE_DIR = .\\src\\
-JsonFileName = results.json
-LogDataBase = log.json
+OUTPUT_DIR=./target/
+EXECUTABLES_DIR=/ExecutableFiles/
+OBJECTFILES_DIR=/ObjectFiles/
+SOURCE_DIR=./src/
+RESULT_JSON_FILE=logs/results.json
+LOG_DATABASE=logs/log.json
 ```
 
 You can replace the various commands and paths with custom paths and files in the system
@@ -24,16 +26,104 @@ You can replace the various commands and paths with custom paths and files in th
 (i haven't dealt with this yet)
 ## Config: Venv
 
-you can install the venv as you please
+you can install the venv as you please. If you are new to all this, then this section is for you
+
+###  Windows
+
+* If you do not have virtualenv go to the terminal and run the following:
+```commandline
+pip install virtualenv
+```
+
+
+#### To configure your venv, go to the directory of the project MiniBuild and run the following in a terminal in that directory:
+```commandline
+python -m venv myenvname
+```
+
+* Now navigate to the activate file to get the virtual environment up and running
+```commandline
+myenvname\Scripts\activate
+```
+
+### Linux
+* To install on Linux, first check if pip is installed: 
+```commandline
+pip --version
+```
+
+
+* If it is not installed run the following command in the terminal:
+#### Ubuntu : 
+```commandline
+sudo apt-get install python-pip
+```
+
+#### Arch Linux : 
+```commandline
+sudo pacman -S python-pip
+```
+
+#### Red Hat Linux (Fedora)
+```commandline
+sudo dnf install python3-pip
+```
+* After that, run the following:
+
+```commandline
+pip install virtualenv
+```
+
+* Now check your installation:
+```commandline
+virtualenv --version
+```
+
+#### Create the virtual environment by running the following command:
+
+```commandline
+virtualenv myenvname
+```
+
+* To activate the virtual environment run the following:
+```commandline
+source myenvname/bin/activate
+```
+
+* To deactivate run the following command:
+```commandline
+deactivate
+```
+
+### With the Virtual environment enabled, run the following commands:
+
+#### Windows : 
+```commandline
+pip install requirements.txt
+```
+
+#### Linux : 
+```commandline
+pip3 install requirements.txt
+```
+
+**Note: For this to work, the virtual environment must be inside the MiniBuild directory**
+
+
 ## Config : Load Your variables
 Create a main script and add the following:
 
+
+
+
 ```python
+import os
 
 from dotenv import dotenv_values
 
 import build
-from utils import readfiles
+import utils.executefiles
+from utils import powerutils
 
 config = dotenv_values('./.env')
 
@@ -41,39 +131,48 @@ c_command = config['C_COMMAND']
 cpp_command = config['CPP_COMMAND']
 cc_command = config['CC_COMMAND']
 output_dir = config['OUTPUT_DIR']
+output_dir_executables = config['OUTPUT_DIR'] + config['EXECUTABLES_DIR']
+output_dir_object_files = config['OUTPUT_DIR'] + config['OBJECTFILES_DIR']
 source_dir = config['SOURCE_DIR']
-json_filename = config['ResultJsonFile']
-log_file = config['LogDataBase']
+result_file = config['RESULT_JSON_FILE']
+log_file = config['LOG_DATABASE']
+
 ```
 
 
 
 # Build Setup: 
-## Quick and Dirty
+## Intro to Building: Quick and Dirty
 
 in the main script add the following:
 ```python
 
 if __name__ == "__main__":
-    my_first_machine = compile.CompileMachine(cpp_command, json_filename,
-                                              log_file,  source_dir,
-                                              output_dir, file_type='c++')
+    my_fourth_machine = build.CompileMachine(c_command, result_file, log_file, source_dir, output_dir, file_type='c')
     my_first_machine.compile_and_dump_exec()
 ```
-## Use a Build Config File
+
+One can specify a subdirectory in the output directory by appending the following to the file:
+```python
+powerutils.change_attribute(my_fourth_machine, 'output_dir_executables', output_dir_executables)
+```
+## Building: Use a Build Config File
 To use a custom JSON build config file first create the JSON file
 
 ```JSON
 [
   {
     "command": "gcc",
-    "json_filename": "results.json",
-    "log_file": "log.json",
-    "source_dir": ".\\src\\",
-    "output_dir": ".\\target\\",
+    "compile_dir_to_executable": true,
     "file_type": "c",
+    "result_file": "logs/results.json",
     "lazy_load": true,
-    "compile_dir_to_executable": true
+    "log_file": "logs/log.json",
+    "output_dir": "./target/",
+    "output_dir_executables": "Executables/",
+    "output_dir_objectfiles": "ObjectFiles/",
+    "recursive_compile_dir": false,
+    "source_dir": "./src/"
   }
 ]
 ```
@@ -83,13 +182,22 @@ Choose as you please
 Now call all of this in the main function using the following:
 ```python
 my_first_machine.use_config(path_to_json_file)
+my_first_machine.compile_and_dump_exec()
 ```
 
+## Build to Object Files: Building
+
+One can also build to object files using the following (note this specifies a subdirectory in the target directory):
+```python
+ powerutils.change_attribute(my_fourth_machine, 'output_dir_objectfiles', output_dir_object_files)
+    my_fourth_machine.compile_to_obj_and_dump()
+```
+## Build to Object Files: Linking
+coming soon....
 
 # Execution
-To modify the file and allow execution of the compiled code, change the last line to the following:
+To modify the file and allow execution of the compiled executable, change the last line to the following:
 ```python
 my_first_machine.compile_and_dump_exec(executeFlag=True)
 ```
-
 
