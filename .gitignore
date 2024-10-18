@@ -3,6 +3,7 @@
 ./venv
 ./__pycache__
 logs/results.json
+logs/log.json
 ./src
 ./target
 ./src/.vscode
