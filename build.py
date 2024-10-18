@@ -41,13 +41,19 @@ class CompileMachine:
                 return True
         return False
 
-    def files_to_compile(self, filetype, recursive_compile_dir):
+    def files_to_compile(self, filetype, recursive_compile_dir, include_object_files=False):
         extensions = []
+        c_extensions = ['.c']
+        cpp_extensions = ['.cpp', '.cxx']
+        object_file_extensions = ['.o']
 
         if filetype == 'c':
-            extensions = ['.c']
+            extensions.extend(c_extensions)
         elif filetype == 'c++':
-            extensions = ['.cpp', '.cxx']
+            extensions.extend(cpp_extensions)
+
+        if include_object_files:
+            extensions.extend(object_file_extensions)
 
         if recursive_compile_dir:
             return self.resolve_dir(self.source_dir, extensions)
@@ -165,7 +171,7 @@ class CompileMachine:
         # logging logic
         log_to_file(json_file, self.log_file, self.lazy_load)
 
-    def __compile_and_dump_exec_dir(self, executeFlag=False, extra_run_args=None, ExecName='a'):
+    def __compile_and_dump_exec_dir(self, executeFlag=False, extra_run_args=None, ExecName='a', include_obj_files=False):
         compilation_results = []
         extension = ''
         if self.os_type != "Windows":
@@ -176,9 +182,9 @@ class CompileMachine:
 
         # lang_type is list
         files_to_compile = self.files_to_compile(filetype=self.file_type,
-                                                 recursive_compile_dir=self.recursive_compile_dir)
+                                                 recursive_compile_dir=self.recursive_compile_dir,
+                                                 include_object_files=include_obj_files)
         runcommands = [self.multi_command]
-
         # file append logic: logic for listing files to be compiled
         for file in files_to_compile:
             runcommands.append(os.path.join(self.source_dir, file))
@@ -248,7 +254,7 @@ class CompileMachine:
             # very disgusting parsing lol
             object_file = (file_parse[len(file_parse) - 1]).split('.')[0] + extension
             commands.append('-o')
-            commands.append(self.output_dir + object_file)
+            commands.append(self.output_dir_objectfiles + object_file)
             result_of_compilation = {
                 'name': [file, object_file],
                 'compile_status': '',
