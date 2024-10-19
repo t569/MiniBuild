@@ -10,7 +10,7 @@ from main import cc_command
 
 
 # please if you are reading this code to understand, start from here and the function compile_and_dump_exec
-class CompileMachine:
+class BuildMachine:
     def lazy_load_check_and_handle(self):
         if self.lazy_load and self._number_of_compiles > 0:
             self.files = lazy_load_func(self.json_filename)
