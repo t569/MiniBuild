@@ -63,11 +63,12 @@ class BuildMachine:
 
     def __init__(self, command, result_file, log_file, source_dir, output_dir, file_type, lazy_load=False,
                  compile_dir_to_executable=False, recursive_compile_dir=False, output_dir_executables=None,
-                 output_dir_objectfiles=None):
+                 output_dir_objectfiles=None, linker_config: typing.Union[dict, None] = None):
         self.files = None
         self.command = command
         self.multi_command = cc_command
         self.json_filename = result_file
+        self.linker_config = linker_config      # please specify this to use it
         self.source_dir = source_dir
         self.output_dir = output_dir
         self.file_type = file_type
@@ -98,6 +99,7 @@ class BuildMachine:
             self.output_dir_objectfiles = output_dir
         else:
             self.output_dir_objectfiles = output_dir_objectfiles
+
 
     @classmethod
     def use_config(cls, json_file):
