@@ -57,7 +57,7 @@ if __name__ == '__main__':
                                    output_dir_executables=output_dir_executables, file_type='c++',
                                    recursive_compile_dir=True)
     a_machine.compile_and_dump_exec()
-    print(a_machine.source_dir)
+
 
 # TODO: implement logic for non-lazy loading
 # TODO: resolve the import/copying of the rufai lang file content (stall this)

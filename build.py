@@ -67,7 +67,7 @@ class BuildMachine:
         self.command = command
         self.multi_command = cc_command
         self.json_filename = result_file
-        self.linker_config = linker_config      # please specify this to use it
+        self.linker_config = linker_config  # please specify this to use it
         self.source_dir = source_dir
         self.output_dir = output_dir
         self.file_type = file_type
@@ -98,7 +98,6 @@ class BuildMachine:
             self.output_dir_objectfiles = output_dir
         else:
             self.output_dir_objectfiles = output_dir_objectfiles
-
 
     @classmethod
     def use_config(cls, json_file):
@@ -149,8 +148,9 @@ class BuildMachine:
         self.lazy_load_check_and_handle()
 
         # compilation process
-        for source_file in self.files:
 
+        # self.files is filled in the function lazy_load_check_and_handle
+        for source_file in self.files:
             bin_name_parse_list = source_file.split('/')
             bin_name_parse_list = bin_name_parse_list[len(bin_name_parse_list) - 1]
 
@@ -181,7 +181,7 @@ class BuildMachine:
         log_to_file(json_file, self.log_file, self.lazy_load)
 
     def __compile_and_dump_dir_to_exec(self, executeFlag=False, extra_run_args=None, ExecName='a',
-                                          include_obj_files=False):
+                                       include_obj_files=False):
         compilation_results = []
         extension = ''
         if self.os_type != "Windows":
@@ -233,7 +233,6 @@ class BuildMachine:
 
         # logging logic
         log_to_file(json_file, self.log_file, self.lazy_load)
-
 
     def compile_and_dump_exec(self, compile_dir_to_executable: typing.Union[str, bool] = False, executeFlag=False,
                               extra_run_args=None, include_obj_files=False):
@@ -290,7 +289,7 @@ class BuildMachine:
         # logging logic
         log_to_file(json_file, self.log_file, self.lazy_load)
 
-    def link_to_dir(self, source_dir_of_object_files, ld_args: dict,  target_dir_for_executable, ExecName='a',):
+    def link_to_dir(self, source_dir_of_object_files, ld_args: dict, target_dir_for_executable, ExecName='a', ):
         """
                 ld_args = {
             "output": "output_file",            # Output file name (-o)
