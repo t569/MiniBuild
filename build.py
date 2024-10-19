@@ -62,7 +62,8 @@ class CompileMachine:
             return [f for f in os.listdir(self.source_dir) if self.is_filetype(extensions, f)]
 
     def __init__(self, command, result_file, log_file, source_dir, output_dir, file_type, lazy_load=False,
-                 compile_dir_to_executable=False, recursive_compile_dir=False, output_dir_executables=None, output_dir_objectfiles=None):
+                 compile_dir_to_executable=False, recursive_compile_dir=False, output_dir_executables=None,
+                 output_dir_objectfiles=None):
         self.files = None
         self.command = command
         self.multi_command = cc_command
@@ -97,7 +98,6 @@ class CompileMachine:
             self.output_dir_objectfiles = output_dir
         else:
             self.output_dir_objectfiles = output_dir_objectfiles
-
 
     @classmethod
     def use_config(cls, json_file):
@@ -171,7 +171,8 @@ class CompileMachine:
         # logging logic
         log_to_file(json_file, self.log_file, self.lazy_load)
 
-    def __compile_and_dump_exec_dir(self, executeFlag=False, extra_run_args=None, ExecName='a', include_obj_files=False):
+    def __compile_and_dump_to_dir_to_exec(self, executeFlag=False, extra_run_args=None, ExecName='a',
+                                          include_obj_files=False):
         compilation_results = []
         extension = ''
         if self.os_type != "Windows":
@@ -225,11 +226,11 @@ class CompileMachine:
         log_to_file(json_file, self.log_file, self.lazy_load)
 
     def compile_and_dump_exec(self, compile_dir_to_executable: typing.Union[str, bool] = False, executeFlag=False,
-                              extra_run_args=None):
+                              extra_run_args=None, include_obj_files=False):
 
         if compile_dir_to_executable:
-            self.__compile_and_dump_exec_dir(executeFlag=executeFlag, ExecName=compile_dir_to_executable,
-                                             extra_run_args=extra_run_args)
+            self.__compile_and_dump_to_dir_to_exec(executeFlag=executeFlag, ExecName=compile_dir_to_executable,
+                                                   extra_run_args=extra_run_args, include_obj_files=include_obj_files)
 
         else:
             self.__compile_and_dump_exec_each(executeFlag=executeFlag, extra_run_args=extra_run_args)
@@ -279,6 +280,5 @@ class CompileMachine:
         # logging logic
         log_to_file(json_file, self.log_file, self.lazy_load)
 
-
-    def link_to_dir(self, source_dir_of_object_files, target_dir_for_executable,ExecName='a'):
+    def link_to_dir(self, source_dir_of_object_files, target_dir_for_executable, ExecName='a'):
         pass
