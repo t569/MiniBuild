@@ -3,7 +3,7 @@ import os
 import json
 import typing
 from utils.powerutils import lazy_load_func
-from utils.powerutils import compile
+from utils.powerutils import execute_commands
 from utils.logging import log_to_file
 # redundant lol
 from main import cc_command
@@ -62,7 +62,7 @@ class BuildMachine:
 
     def __init__(self, command, result_file, log_file, source_dir, output_dir, file_type, lazy_load=False,
                  compile_dir_to_executable=False, recursive_compile_dir=False, output_dir_executables=None,
-                 output_dir_objectfiles=None, linker_config: typing.Union[dict, None] = None):
+                 output_dir_objectfiles=None, linker_config: typing.Union[dict, None] = None, project_name="new_project"):
         self.files = None
         self.command = command
         self.multi_command = cc_command
@@ -72,6 +72,7 @@ class BuildMachine:
         self.output_dir = output_dir
         self.file_type = file_type
         self.log_file = log_file
+        self.project_name = project_name
         self._number_of_compiles = 0
         self.os_type = platform.system()
         if lazy_load:
@@ -119,7 +120,8 @@ class BuildMachine:
                 compile_dir_to_executable=config_dict[0]['compile_dir_to_executable'],
                 output_dir_objectfiles=config_dict[0]['output_dir'] + config_dict[0]['output_dir_objectfiles'],
                 output_dir_executables=config_dict[0]['output_dir'] + config_dict[0]['output_dir_executables'],
-                recursive_compile_dir=config_dict[0]['recursive_compile_dir']
+                recursive_compile_dir=config_dict[0]['recursive_compile_dir'],
+                project_name = config_dict[0]['project_name']
             )
 
         except json.JSONDecodeError:
@@ -162,7 +164,7 @@ class BuildMachine:
                 'compile_status': '',
                 'output': '',
             }
-            result_of_compilation = compile(runcommands=runcommands,
+            result_of_compilation = execute_commands(runcommands=runcommands,
                                             execute=executeFlag,
                                             results=result_of_compilation,
                                             file_to_compile=bin_name_parse_list,
@@ -215,7 +217,7 @@ class BuildMachine:
         self.lazy_load_check_and_handle()
 
         # compilation process
-        result_of_compilation = compile(runcommands=runcommands,
+        result_of_compilation = execute_commands(runcommands=runcommands,
                                         execute=executeFlag,
                                         file_to_compile=self.source_dir,
                                         os_type=self.os_type,
@@ -254,7 +256,7 @@ class BuildMachine:
         # create all the object files, make them recursive if we are using recursive compile
         files_to_compile_list = self.files_to_compile(filetype=self.file_type,
                                                       recursive_compile_dir=self.recursive_compile_dir)
-
+        # Note: this files_to_compile function encapsulate the source dir
         # implement the commands
 
         for file in files_to_compile_list:
@@ -271,7 +273,7 @@ class BuildMachine:
                 'output': '',
             }
             # execute is ALWAYS False and extra_run_args is ALWAYS None
-            result_of_compilation = compile(runcommands=commands,
+            result_of_compilation = execute_commands(runcommands=commands,
                                             execute=False,
                                             results=result_of_compilation,
                                             file_to_compile=file,
@@ -289,7 +291,7 @@ class BuildMachine:
         # logging logic
         log_to_file(json_file, self.log_file, self.lazy_load)
 
-    def link_to_dir(self, source_dir_of_object_files, ld_args: dict, target_dir_for_executable, ExecName='a', ):
+    # def link_to_dir(self, source_dir_of_object_files, ld_args: dict, target_dir_for_executable, ExecName='a', ):
         """
                 ld_args = {
             "output": "output_file",            # Output file name (-o)

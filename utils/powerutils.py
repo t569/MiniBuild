@@ -33,11 +33,17 @@ def lazy_load_func(json_filename) -> list:
     return lazy_load_log
 
 
-def compile(runcommands, execute, results, file_to_compile, output_bin, os_type, extra_run_args=None) -> list:
+def execute_commands(runcommands, execute, results, file_to_compile, output_bin, os_type, linkFlag=False, extra_run_args=None) -> list:
     try:
         subprocess.run(runcommands, capture_output=True, text=True, check=True)
+        process = ""
+        message = f"{process} of {file_to_compile} successful"
+        if linkFlag:
+            process = "Linking"
+        else:
+            process = "Compilation"
 
-        print(f"Compilation of {file_to_compile} successful")
+        print(f"{process} of {file_to_compile} successful")
         results['compile_status'] = 'success'
 
         # output_bin = output_dir + file
