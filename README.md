@@ -24,6 +24,9 @@ You can replace the various commands and paths with custom paths and files in th
 ### Note:
 **Remember to create the files and directories in case of errors**
 (i haven't dealt with this yet)
+
+### Note:
+there are stilla couple of parameters to be specified if you're using a .env like lazyLoad for example
 ## Config: Venv
 
 you can install the venv as you please. If you are new to all this, then this section is for you
