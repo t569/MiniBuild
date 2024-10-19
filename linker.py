@@ -80,6 +80,7 @@ class LinkerMachine:
             self.lang_type = self.ld_args[0]['language']
             self.command = self.ld_args[0]['command']
             self.results = self.ld_args[0]['results']
+            self.object_files_dir = self.ld_args[0]['object_files_dir']
             if self.lang_type is None:  # this is the default
                 self.lang_type = "c"
 
@@ -89,10 +90,14 @@ class LinkerMachine:
         # checking if the ld_args are actually
         # Omo let me chill here first
 
-    def link_dir_to_exec(self, output_dir_param='./target/Executables/', project_name='test',
-                         executeFlag=False, extra_run_args=None):  # this is the default
+    def link_dir_to_exec(self, output_dir_param=None, project_name='test',
+                         # project name should be passed into the function
+                         executeFlag=False, extra_run_args=None, ):  # this is the default
 
-        # project name should be passed into the function
+        # if we do not specify an output_dir, use the one in the JSON File
+        if output_dir_param is None:
+            output_dir_param = self.object_files_dir
+
         object_files = files_to_link(self.source_dir)
         linking_results = []
 
@@ -113,7 +118,6 @@ class LinkerMachine:
 
         build_type = self.ld_args[0]['build_type']
         output_dir = output_dir_param + project_name + '/' + 'build/' + build_type
-        print(output_dir)
 
         # make the output build directory if it doesn't exist
         try:
@@ -138,7 +142,6 @@ class LinkerMachine:
             'link_status': '',
             'output': '',
         }
-        print(commands)
         result_of_compilation = execute_commands(runcommands=commands,
                                                  execute=executeFlag,
                                                  file_to_compile=self.source_dir,
@@ -147,15 +150,8 @@ class LinkerMachine:
                                                  output_bin=output_binary,
                                                  extra_run_args=extra_run_args)
 
-        print("++++++++++++++++++++")
-        print(result_of_compilation)
-
         linking_results.append(result_of_compilation)
 
         json_file = os.path.join('./', self.results)
         with open(json_file, 'w') as jsonFile:
             json.dump(linking_results, jsonFile, indent=4)
-
-
-linker = LinkerMachine('linkerconfig.json')
-linker.link_dir_to_exec()

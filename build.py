@@ -54,11 +54,10 @@ class BuildMachine:
 
         if include_object_files:
             extensions.extend(object_file_extensions)
-
         if recursive_compile_dir:
             return self.resolve_dir(self.source_dir, extensions)
         else:
-            return [f for f in os.listdir(self.source_dir) if self.is_filetype(extensions, f)]
+            return [os.path.join(self.source_dir,f) for f in os.listdir(self.source_dir) if self.is_filetype(extensions, f)]
 
     def __init__(self, command, result_file, log_file, source_dir, output_dir, file_type, lazy_load=False,
                  compile_dir_to_executable=False, recursive_compile_dir=False, output_dir_executables=None,
@@ -119,8 +118,7 @@ class BuildMachine:
                 compile_dir_to_executable=config_dict[0]['compile_dir_to_executable'],
                 output_dir_objectfiles=config_dict[0]['output_dir'] + config_dict[0]['output_dir_objectfiles'],
                 output_dir_executables=config_dict[0]['output_dir'] + config_dict[0]['output_dir_executables'],
-                recursive_compile_dir=config_dict[0]['recursive_compile_dir'],
-                project_name=config_dict[0]['project_name']
+                recursive_compile_dir=config_dict[0]['recursive_compile_dir']
             )
 
         except json.JSONDecodeError:
@@ -164,12 +162,12 @@ class BuildMachine:
                 'output': '',
             }
             result_of_compilation = execute_commands(runcommands=runcommands,
-                                            execute=executeFlag,
-                                            results=result_of_compilation,
-                                            file_to_compile=bin_name_parse_list,
-                                            output_bin=output_binary,
-                                            os_type=self.os_type,
-                                            extra_run_args=extra_run_args)
+                                                     execute=executeFlag,
+                                                     results=result_of_compilation,
+                                                     file_to_compile=bin_name_parse_list,
+                                                     output_bin=output_binary,
+                                                     os_type=self.os_type,
+                                                     extra_run_args=extra_run_args)
 
             compilation_results.append(result_of_compilation)
 
@@ -217,12 +215,12 @@ class BuildMachine:
 
         # compilation process
         result_of_compilation = execute_commands(runcommands=runcommands,
-                                        execute=executeFlag,
-                                        file_to_compile=self.source_dir,
-                                        os_type=self.os_type,
-                                        results=result_of_compilation,
-                                        output_bin=output_binary,
-                                        extra_run_args=extra_run_args)
+                                                 execute=executeFlag,
+                                                 file_to_compile=self.source_dir,
+                                                 os_type=self.os_type,
+                                                 results=result_of_compilation,
+                                                 output_bin=output_binary,
+                                                 extra_run_args=extra_run_args)
 
         compilation_results.append(result_of_compilation)
 
@@ -265,7 +263,9 @@ class BuildMachine:
             # very disgusting parsing lol
             object_file = (file_parse[len(file_parse) - 1]).split('.')[0] + extension
             commands.append('-o')
+            # print(self.output_dir_objectfiles)
             commands.append(self.output_dir_objectfiles + object_file)
+            print(commands)
             result_of_compilation = {
                 'name': [file, object_file],
                 'compile_status': '',
@@ -273,12 +273,12 @@ class BuildMachine:
             }
             # execute is ALWAYS False and extra_run_args is ALWAYS None
             result_of_compilation = execute_commands(runcommands=commands,
-                                            execute=False,
-                                            results=result_of_compilation,
-                                            file_to_compile=file,
-                                            output_bin=object_file,
-                                            os_type=self.os_type,
-                                            extra_run_args=None)
+                                                     execute=False,
+                                                     results=result_of_compilation,
+                                                     file_to_compile=file,
+                                                     output_bin=object_file,
+                                                     os_type=self.os_type,
+                                                     extra_run_args=None)
 
             compilation_results.append(result_of_compilation)
 
@@ -290,7 +290,7 @@ class BuildMachine:
         # logging logic
         log_to_file(json_file, self.log_file, self.lazy_load)
 
-    # def link_to_dir(self, source_dir_of_object_files, ld_args: dict, target_dir_for_executable, ExecName='a', ):
+        # def link_to_dir(self, source_dir_of_object_files, ld_args: dict, target_dir_for_executable, ExecName='a', ):
         """
                 ld_args = {
             "output": "output_file",            # Output file name (-o)
@@ -310,4 +310,3 @@ class BuildMachine:
         Extra Notes .a files are linked statically: copied into the file statically.
         .so files are linked dynamically: copied into the executable at runtime
         """
-        pass
