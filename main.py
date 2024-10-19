@@ -17,6 +17,7 @@ output_dir_object_files = config['OUTPUT_DIR'] + config['OBJECTFILES_DIR']
 source_dir = config['SOURCE_DIR']
 result_file = config['RESULT_JSON_FILE']
 log_file = config['LOG_DATABASE']
+lazy_load = config['LAZY_LOAD']
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -38,17 +39,18 @@ if __name__ == '__main__':
      
     """
     my_third_machine = build.CompileMachine.use_config('buildconfig.json')
-    my_third_machine.compile_and_dump_exec(compile_dir_to_executable='kome')
+
+    # this allows you to include object files in the compilation pipeline
+    my_third_machine.compile_and_dump_exec(compile_dir_to_executable='kome', include_obj_files=True)
 
 
     my_fourth_machine = build.CompileMachine(c_command, result_file, log_file, source_dir, output_dir, file_type='c',
                                              recursive_compile_dir=True)
-    # powerutils.change_attribute(my_fourth_machine, 'output_dir_objectfiles', output_dir_object_files)
+    powerutils.change_attribute(my_fourth_machine, 'output_dir_objectfiles', output_dir_object_files)
     my_fourth_machine.compile_to_obj_and_dump()
     print(my_fourth_machine.output_dir_objectfiles)
 
 
-# TODO: match format cc main.c obj1.o obj2.o ....
 # TODO: implement logic for non-lazy loading
 # TODO: resolve the import/copying of the rufai lang file content (stall this)
 # TODO: implement testing
