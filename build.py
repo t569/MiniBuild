@@ -62,7 +62,7 @@ class BuildMachine:
 
     def __init__(self, command, result_file, log_file, source_dir, output_dir, file_type, lazy_load=False,
                  compile_dir_to_executable=False, recursive_compile_dir=False, output_dir_executables=None,
-                 output_dir_objectfiles=None, linker_config: typing.Union[dict, None] = None, project_name="new_project"):
+                 output_dir_objectfiles=None, linker_config: typing.Union[dict, None] = None):
         self.files = None
         self.command = command
         self.multi_command = cc_command
@@ -72,7 +72,6 @@ class BuildMachine:
         self.output_dir = output_dir
         self.file_type = file_type
         self.log_file = log_file
-        self.project_name = project_name
         self._number_of_compiles = 0
         self.os_type = platform.system()
         if lazy_load:
@@ -121,7 +120,7 @@ class BuildMachine:
                 output_dir_objectfiles=config_dict[0]['output_dir'] + config_dict[0]['output_dir_objectfiles'],
                 output_dir_executables=config_dict[0]['output_dir'] + config_dict[0]['output_dir_executables'],
                 recursive_compile_dir=config_dict[0]['recursive_compile_dir'],
-                project_name = config_dict[0]['project_name']
+                project_name=config_dict[0]['project_name']
             )
 
         except json.JSONDecodeError:

@@ -94,6 +94,7 @@ class LinkerMachine:
     def link_dir_to_exec(self, output_dir_param='./target/Executables/', project_name='test',
                          executeFlag=False, extra_run_args=None):  # this is the default
 
+        # project name should be passed into the function
         object_files = files_to_link(self.source_dir)
         linking_results = []
 
