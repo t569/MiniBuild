@@ -151,7 +151,7 @@ class BuildMachine:
         # compilation process
         for source_file in self.files:
 
-            bin_name_parse_list = file.split('/')
+            bin_name_parse_list = source_file.split('/')
             bin_name_parse_list = bin_name_parse_list[len(bin_name_parse_list) - 1]
 
             output_binary = os.path.join(self.output_dir_executables, bin_name_parse_list.split('.')[0])
