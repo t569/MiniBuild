@@ -57,7 +57,6 @@ class BuildMachine:
 
         if recursive_compile_dir:
             return self.resolve_dir(self.source_dir, extensions)
-
         else:
             return [f for f in os.listdir(self.source_dir) if self.is_filetype(extensions, f)]
 
@@ -134,6 +133,13 @@ class BuildMachine:
             print(f"An error occurred: {e}")
 
     def __compile_and_dump_exec_each(self, executeFlag=False, extra_run_args=None):
+
+        """
+           This function compiles all the C/C++ files in a directory to a binary in a target directory.
+           It also chooses to optionally execute with the executeFlag flag
+
+        """
+
         compilation_results = []
         extension = ''
         if self.os_type == "Windows":
@@ -143,22 +149,23 @@ class BuildMachine:
         self.lazy_load_check_and_handle()
 
         # compilation process
-        for file in self.files:
-            source_file = os.path.join(self.source_dir, file)
-            output_binary = os.path.join(self.output_dir_executables, file.split('.')[0])
+        for source_file in self.files:
 
+            bin_name_parse_list = file.split('/')
+            bin_name_parse_list = bin_name_parse_list[len(bin_name_parse_list) - 1]
+
+            output_binary = os.path.join(self.output_dir_executables, bin_name_parse_list.split('.')[0])
             runcommands = [self.command, source_file, '-o', output_binary]
 
             result_of_compilation = {
-                'name': [file, file.split('.')[0] + extension],
+                'name': [source_file, bin_name_parse_list.split('.')[0] + extension],
                 'compile_status': '',
                 'output': '',
             }
-
             result_of_compilation = compile(runcommands=runcommands,
                                             execute=executeFlag,
                                             results=result_of_compilation,
-                                            file_to_compile=file,
+                                            file_to_compile=bin_name_parse_list,
                                             output_bin=output_binary,
                                             os_type=self.os_type,
                                             extra_run_args=extra_run_args)
@@ -173,7 +180,7 @@ class BuildMachine:
         # logging logic
         log_to_file(json_file, self.log_file, self.lazy_load)
 
-    def __compile_and_dump_to_dir_to_exec(self, executeFlag=False, extra_run_args=None, ExecName='a',
+    def __compile_and_dump_dir_to_exec(self, executeFlag=False, extra_run_args=None, ExecName='a',
                                           include_obj_files=False):
         compilation_results = []
         extension = ''
@@ -227,12 +234,13 @@ class BuildMachine:
         # logging logic
         log_to_file(json_file, self.log_file, self.lazy_load)
 
+
     def compile_and_dump_exec(self, compile_dir_to_executable: typing.Union[str, bool] = False, executeFlag=False,
                               extra_run_args=None, include_obj_files=False):
 
         if compile_dir_to_executable:
-            self.__compile_and_dump_to_dir_to_exec(executeFlag=executeFlag, ExecName=compile_dir_to_executable,
-                                                   extra_run_args=extra_run_args, include_obj_files=include_obj_files)
+            self.__compile_and_dump_dir_to_exec(executeFlag=executeFlag, extra_run_args=extra_run_args,
+                                                ExecName=compile_dir_to_executable, include_obj_files=include_obj_files)
 
         else:
             self.__compile_and_dump_exec_each(executeFlag=executeFlag, extra_run_args=extra_run_args)
@@ -282,5 +290,24 @@ class BuildMachine:
         # logging logic
         log_to_file(json_file, self.log_file, self.lazy_load)
 
-    def link_to_dir(self, source_dir_of_object_files, target_dir_for_executable, ExecName='a'):
+    def link_to_dir(self, source_dir_of_object_files, ld_args: dict,  target_dir_for_executable, ExecName='a',):
+        """
+                ld_args = {
+            "output": "output_file",            # Output file name (-o)
+            "input_files": ["file1.o", "file2.o"],  # Input object files                                                                                       \n
+            "library_paths": ["/usr/lib", "/usr/local/lib"],  # Library search paths (-L)       SPECIFIES THE NAME OF THE PATHS FOR FINDING THE LIBRARY FILES  \n
+            "libraries": ["m", "c"],           # Libraries to link against (-l)                 SPECIFIES THE NAME OF THE LIBRARIES IN THE LIBRARY PATHS FORM: libname.so or libname.a  \n
+            "entry": "main",                   # Entry point (-e)                               SPECIFIES AND ENTRY POINT OTHER THAN MAIN                      \n
+            "script": "linker_script.ld",      # Linker script (-T)                             WARNING: DONT TOUCH THIS FLAG, TOO SENSITIVE                   \n
+            "shared": False,                   # Create shared library (-shared)                CREATES A SHARED LIBRARY AND NOT A BINARY                      \n
+            "static": False,                   # Force static linking (-static)                 LINKING A STATIC LIBRARY TO THE OUTPUT                         \n
+            "debug": True,                     # Include debugging information (-g)             ADDS DEBUG INFORMATION                                         \n
+            "relocatable": False,              # Generate relocatable output (-r)
+            "strip_debug": False,              # Strip debugging symbols (-S)
+            "nostdlib": False,                 # Do not use standard libraries (-nostdlib)
+            "verbose": False                   # Verbose mode (-v)
+        }  \n
+        Extra Notes .a files are linked statically: copied into the file statically.
+        .so files are linked dynamically: copied into the executable at runtime
+        """
         pass

@@ -17,7 +17,6 @@ output_dir_object_files = config['OUTPUT_DIR'] + config['OBJECTFILES_DIR']
 source_dir = config['SOURCE_DIR']
 result_file = config['RESULT_JSON_FILE']
 log_file = config['LOG_DATABASE']
-lazy_load = config['LAZY_LOAD']
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -53,7 +52,12 @@ if __name__ == '__main__':
     
     """
 
-
+    a_machine = build.BuildMachine(cpp_command, result_file, log_file, source_dir,
+                                   output_dir=output_dir,
+                                   output_dir_executables=output_dir_executables, file_type='c++',
+                                   recursive_compile_dir=True)
+    a_machine.compile_and_dump_exec()
+    print(a_machine.source_dir)
 
 # TODO: implement logic for non-lazy loading
 # TODO: resolve the import/copying of the rufai lang file content (stall this)
