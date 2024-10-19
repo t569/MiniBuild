@@ -8,3 +8,4 @@ logs/log.json
 ./target
 ./src/.vscode
 buildconfig.json
+linkerconfig.json

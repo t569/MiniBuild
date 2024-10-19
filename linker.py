@@ -80,8 +80,6 @@ class LinkerMachine:
             self.lang_type = self.ld_args[0]['language']
             self.command = self.ld_args[0]['command']
             self.results = self.ld_args[0]['results']
-            self.project_name = self.ld_args[0]['project_name']
-            print(self.project_name)
             if self.lang_type is None:  # this is the default
                 self.lang_type = "c"
 
@@ -136,7 +134,7 @@ class LinkerMachine:
             raise Exception("lib paths not specified")
 
         result_of_linking = {
-            'dir': [self.project_name, executable_name],
+            'dir': [project_name, executable_name],
             'link_status': '',
             'output': '',
         }
