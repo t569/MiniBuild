@@ -75,6 +75,7 @@ class LinkerMachine:
 
             self.ld_args = config_info
             self.source_dir = self.ld_args[0]['object_files_dir']
+            self.out_dir = self.ld_args[0]['output_exec_dir']
             self.build_type = self.ld_args[0]['build_type']
             self.ld_flag = self.ld_args[0]['ldflags'][self.build_type]
             self.lang_type = self.ld_args[0]['language']
@@ -96,7 +97,7 @@ class LinkerMachine:
 
         # if we do not specify an output_dir, use the one in the JSON File
         if output_dir_param is None:
-            output_dir_param = self.object_files_dir
+            output_dir_param = self.out_dir
 
         object_files = files_to_link(self.source_dir)
         linking_results = []
@@ -106,9 +107,13 @@ class LinkerMachine:
 
         external_libraries = self.ld_args[0]['external_libraries']
         executable_name = self.ld_args[0]['executable_name']
+
         if executable_name is None:
+            # auto
             executable_name = 'a' + self.extension
         else:
+            if self.os_type == "windows":
+                executable_name = executable_name + self.extension
             if self.os_type != "windows":
                 # do nothing
                 pass
@@ -125,10 +130,9 @@ class LinkerMachine:
         except Exception as e:
             print(f"Error creating directory: {output_dir} \n Error: {e} ")
 
-        output_binary = os.path.join(output_dir + '/', executable_name)
-
-        commands = [self.command, self.ld_flag, "-o", output_binary]
-
+        self.output_binary = os.path.join(output_dir + '/', executable_name)
+        print(self.output_binary)
+        commands = [self.command, self.ld_flag, "-o", self.output_binary]
         commands.extend(object_files)
         if lib_paths_flags:
             commands.extend(lib_paths_flags)
@@ -138,7 +142,7 @@ class LinkerMachine:
             raise Exception("lib paths not specified")
 
         result_of_linking = {
-            'dir': [project_name, executable_name],
+            'dir': [project_name, executable_name + self.extension],
             'link_status': '',
             'output': '',
         }
@@ -147,11 +151,14 @@ class LinkerMachine:
                                                  file_to_compile=self.source_dir,
                                                  os_type=self.os_type,
                                                  results=result_of_linking,
-                                                 output_bin=output_binary,
-                                                 extra_run_args=extra_run_args)
+                                                 output_bin=self.output_binary,
+                                                 extra_run_args=extra_run_args,
+                                                 linkFlag=True)
 
         linking_results.append(result_of_compilation)
-
+        print(linking_results)
         json_file = os.path.join('./', self.results)
         with open(json_file, 'w') as jsonFile:
             json.dump(linking_results, jsonFile, indent=4)
+
+        # TODO: IMPLEMENT LAZY LOADING

@@ -60,6 +60,7 @@ if __name__ == '__main__':
 
 
 # TODO: implement logic for non-lazy loading
+# TODO: Work properly on JSON logging
+# TODO: refactor this function to work well with the json :executefiles.py
 # TODO: resolve the import/copying of the rufai lang file content (stall this)
-# TODO: implement testing
-# TODO: multithreading
+

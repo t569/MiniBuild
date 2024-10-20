@@ -265,7 +265,6 @@ class BuildMachine:
             commands.append('-o')
             # print(self.output_dir_objectfiles)
             commands.append(self.output_dir_objectfiles + object_file)
-            print(commands)
             result_of_compilation = {
                 'name': [file, object_file],
                 'compile_status': '',

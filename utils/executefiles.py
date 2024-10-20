@@ -22,18 +22,22 @@ def execute(os_platform, executable_path, extra_args=None):
 
 def execute_and_dump(json_filename, bin_dir):
     # search through the json file
-    json_file = os.path.join('../', json_filename)
-    os_plat = platform.system()
 
+    json_file = os.path.join('./', json_filename)
+    os_plat = platform.system()
+    print(json_file)
     # execute them and put them in the json file
     extern_data = []
     with open(json_file, 'r+') as jsonFile:
         extern_data = json.load(jsonFile)
 
+        # TODO: refactor this function to work well with the json
         for entry in extern_data:
-            if entry.get('compile_status') == 'success' or entry.get('compile_link_status') == 'success':
+            """
+            if entry.get('compile_status') == 'success' or entry.get('link_status') == 'success':
                 try:
-                    executable_path = os.path.join(bin_dir, (entry.get('name')[1]).split('.')[0])
+                    executable_path = os.path.join(bin_dir, (entry.get('dir')[1]).split('.')[0])
+                    print(executable_path)
                     stdout, stderr = execute(os_plat, executable_path)
                     print(f"Execution of {executable_path} successful")
                     entry['output'] = {'stdout': stdout, 'stderr': stderr}
@@ -41,7 +45,9 @@ def execute_and_dump(json_filename, bin_dir):
                 except subprocess.CalledProcessError as e:
                     print(f"Error during execution of {executable_path}")
                     entry['output'] = {'runtime_error': e.returncode}
-
+            """
+            print(entry.get('compile_status'))
+            print(entry.get('link_status'))
     with open(json_file, 'w+') as jsonFile:
         json.dump(extern_data, jsonFile, indent=4)
 
