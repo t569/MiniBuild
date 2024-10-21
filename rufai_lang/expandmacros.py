@@ -7,21 +7,24 @@ from buildrules import *
 # the command and the rule
 
 commands_to_parse = {
-    '~init_build_box':  init_build_box_rule,
-    '~compile_build_box':   compile_build_box_rule,
-    '~execute_build_box':   execute_build_box_rule,
+    '~init_build_box': init_build_box_rule,
+    '~compile_build_box': compile_build_box_rule,
+    '~execute_build_box': execute_build_box_rule,
 }
 
 macro_file_name = "rufai.txt"
 target_file_dir = '.\\rufai_files\\'
 target_file_executables_dir = '\\executables\\'
 
-# open the file and read it
-with open(target_file_dir + macro_file_name, 'r') as macro_file:
-    output = macro_file.read()
 
-# expand the macros
-lines = output.split('\n')
+def skip_leading_tabs_and_spaces(line):
+    count = 0
+    for char in line:
+        if char == ' ':
+            count += 1
+        else:
+            break
+    return count
 
 
 def collect_macros(file_txt):
@@ -30,25 +33,28 @@ def collect_macros(file_txt):
     for line in lines:
         line_count += 1
         if line:
-            if line[0] == '~':
+            # remove all the leading spaces
+            if line[skip_leading_tabs_and_spaces(line)] == '~':
                 to_expand.append([line, line_count])
 
     return to_expand
 
+
 def handle_macros_errors(macro):
+    begining_of_macro = skip_leading_tabs_and_spaces(macro[0])
     count = 0
-    for char in macro[0]:
+
+    for char in macro[0][begining_of_macro:]:
         if char == '~' and count == 0:
             continue
+
         elif char == '~' and count != 0:
-            raise Exception(f"Invalid Macro: Error at line: {macro[1]}")
+            raise Exception(f"Invalid macro: Error at line : {macro[1]}")
 
         count += 1
 
 
-macros_to_expand = collect_macros(output)
-
-# clean up the file
+# TODO: check usage (1 usage) for the TODOs
 def split_macros(macro_instance):
     pattern = r'(?P<command_name>~?\w+)\((?P<args_and_flags>[^)]*)\)'
 
@@ -82,35 +88,49 @@ def split_macros(macro_instance):
         return None, None  # nothing to match
 
 
-def clean_macros(macros_to_expand):
+def clean_macros(target_macros_to_expand):
     clean_macros_list = []
-    for macro in macros_to_expand:
-
+    for macro in target_macros_to_expand:
         # first handle the errors
         handle_macros_errors(macro)
+        # TODO: modify the split_macros function to recognise leading tabs and spaces
         command = split_macros(macro[0])  # macro[1] is the line number
+        print(command)
+        print("00000000000000000000")
         clean_macros_list.append([call_command_rule(command[0], commands_to_parse, command[1]), macro[1]])
 
     return clean_macros_list
-        
 
+
+# open the file and read it
+with open(target_file_dir + macro_file_name, 'r') as macro_file:
+    output = macro_file.read()
+
+# expand the macros
+lines = output.split('\n')
+
+# defined a helper function for skipping tabs and spaces
+
+
+
+# collect the macros to expand
+macros_to_expand = collect_macros(output)
+
+# clean up the file
+
+# TODO: make the macros include leading spaces: check clean_macros function
 clean_macros_list = clean_macros(macros_to_expand)
-
+print(clean_macros_list)
 
 # finally, write these lines back to the txt
 # open the file and read it
 with open(target_file_dir + macro_file_name, 'r') as macro_file:
     lines_read = macro_file.readlines()
 
-
 for items in clean_macros_list:
     # modify the lines in lines_read
     lines_read[items[1] - 1] = ''.join(str(item) for item in items[0])
 
-
-
 # all that is left is to dump all this rubbish into a python file
 with open(target_file_dir + target_file_executables_dir + macro_file_name.split('.')[0] + '.py', 'w') as python_file:
     python_file.writelines(lines_read)
-
-
