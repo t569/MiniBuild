@@ -17,10 +17,11 @@ target_file_dir = '.\\rufai_files\\'
 target_file_executables_dir = '\\executables\\'
 
 
+# defined a helper function for skipping tabs and spaces
 def skip_leading_tabs_and_spaces(line):
     count = 0
     for char in line:
-        if char == ' ':
+        if char == ' ' or char == '\t':
             count += 1
         else:
             break
@@ -41,10 +42,10 @@ def collect_macros(file_txt):
 
 
 def handle_macros_errors(macro):
-    begining_of_macro = skip_leading_tabs_and_spaces(macro[0])
+    beginning_of_macro = skip_leading_tabs_and_spaces(macro[0])
     count = 0
 
-    for char in macro[0][begining_of_macro:]:
+    for char in macro[0][beginning_of_macro:]:
         if char == '~' and count == 0:
             continue
 
@@ -56,7 +57,8 @@ def handle_macros_errors(macro):
 
 # TODO: check usage (1 usage) for the TODOs
 def split_macros(macro_instance):
-    pattern = r'(?P<command_name>~?\w+)\((?P<args_and_flags>[^)]*)\)'
+    # added leading space matching
+    pattern = r'^[ \t]*(?P<command_name>~?\w+)\((?P<args_and_flags>[^)]*)\)'
 
     match = re.match(pattern, macro_instance.strip())
 
@@ -88,16 +90,20 @@ def split_macros(macro_instance):
         return None, None  # nothing to match
 
 
+def count_indent(target_macro):
+    return skip_leading_tabs_and_spaces(target_macro[0])
+
+
 def clean_macros(target_macros_to_expand):
     clean_macros_list = []
     for macro in target_macros_to_expand:
         # first handle the errors
         handle_macros_errors(macro)
-        # TODO: modify the split_macros function to recognise leading tabs and spaces
+
         command = split_macros(macro[0])  # macro[1] is the line number
-        print(command)
-        print("00000000000000000000")
-        clean_macros_list.append([call_command_rule(command[0], commands_to_parse, command[1]), macro[1]])
+        clean_macro_to_append = [call_command_rule(command[0], commands_to_parse, command[1]), macro[1]]
+        clean_macro_to_append[0].insert(0, count_indent(macro) * ' ')
+        clean_macros_list.append(clean_macro_to_append)
 
     return clean_macros_list
 
@@ -109,27 +115,26 @@ with open(target_file_dir + macro_file_name, 'r') as macro_file:
 # expand the macros
 lines = output.split('\n')
 
-# defined a helper function for skipping tabs and spaces
-
-
-
 # collect the macros to expand
 macros_to_expand = collect_macros(output)
+# print(macros_to_expand)
 
 # clean up the file
 
 # TODO: make the macros include leading spaces: check clean_macros function
 clean_macros_list = clean_macros(macros_to_expand)
-print(clean_macros_list)
 
 # finally, write these lines back to the txt
 # open the file and read it
 with open(target_file_dir + macro_file_name, 'r') as macro_file:
     lines_read = macro_file.readlines()
+# print(lines_read)
 
 for items in clean_macros_list:
     # modify the lines in lines_read
     lines_read[items[1] - 1] = ''.join(str(item) for item in items[0])
+    lines_read[items[1] - 1] += '\n'
+
 
 # all that is left is to dump all this rubbish into a python file
 with open(target_file_dir + target_file_executables_dir + macro_file_name.split('.')[0] + '.py', 'w') as python_file:

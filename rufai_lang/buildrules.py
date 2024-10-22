@@ -82,7 +82,7 @@ def execute_build_box_rule(dictionary_of_args):
     replace_list.append("extra_args")
     replace_list.append('=')
     replace_list.append(f"{dictionary_of_args['extra_args']}")
-    print(dictionary_of_args)
+    # print(dictionary_of_args)
 
     replace_list.append(')')
 
