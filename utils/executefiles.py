@@ -21,6 +21,7 @@ def execute(os_platform, executable_path, extra_args=None):
 
 
 def execute_and_dump(json_filename, bin_dir):
+    # note bin_dir should be the path to the output executable
     # search through the json file
 
     json_file = os.path.join('./', json_filename)
@@ -36,7 +37,7 @@ def execute_and_dump(json_filename, bin_dir):
 
             if entry.get('compile_status') == 'success' or entry.get('link_status') == 'success':
                 try:
-                    executable_path = os.path.join(bin_dir, '/' + (entry.get('dir')[1]).split('.')[0])
+                    # executable_path = os.path.join(bin_dir, '/' + (entry.get('dir')[1]).split('.')[0])
                     # stdout, stderr = execute(os_plat, executable_path)
                     stdout, stderr = execute(os_plat, bin_dir)
                     print(f"Execution of {executable_path} successful")
