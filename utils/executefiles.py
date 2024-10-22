@@ -37,7 +37,7 @@ def execute_and_dump(json_filename, bin_dir):
 
             if entry.get('compile_status') == 'success' or entry.get('link_status') == 'success':
                 try:
-                    # executable_path = os.path.join(bin_dir, '/' + (entry.get('dir')[1]).split('.')[0])
+                    executable_path = os.path.join(bin_dir, '/' + (entry.get('dir')[1]).split('.')[0])
                     # stdout, stderr = execute(os_plat, executable_path)
                     stdout, stderr = execute(os_plat, bin_dir)
                     print(f"Execution of {executable_path} successful")
