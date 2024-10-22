@@ -10,6 +10,11 @@ commands_to_parse = {
     '~init_build_box': init_build_box_rule,
     '~compile_build_box': compile_build_box_rule,
     '~execute_build_box': execute_build_box_rule,
+    '~init_link_box': init_link_box_rule,
+    '~link_to_dir_link_box': link_to_dir_link_box_rule,
+    '~init_project': init_project_rule,
+    '~compile_project': compile_project_to_object_files,
+    '~link_project': link_project_to_dir_rule,
 }
 
 macro_file_name = "rufai.txt"
@@ -55,7 +60,6 @@ def handle_macros_errors(macro):
         count += 1
 
 
-# TODO: check usage (1 usage) for the TODOs
 def split_macros(macro_instance):
     # added leading space matching
     pattern = r'^[ \t]*(?P<command_name>~?\w+)\((?P<args_and_flags>[^)]*)\)'
@@ -102,6 +106,7 @@ def clean_macros(target_macros_to_expand):
 
         command = split_macros(macro[0])  # macro[1] is the line number
         clean_macro_to_append = [call_command_rule(command[0], commands_to_parse, command[1]), macro[1]]
+
         clean_macro_to_append[0].insert(0, count_indent(macro) * ' ')
         clean_macros_list.append(clean_macro_to_append)
 
@@ -120,8 +125,6 @@ macros_to_expand = collect_macros(output)
 # print(macros_to_expand)
 
 # clean up the file
-
-# TODO: make the macros include leading spaces: check clean_macros function
 clean_macros_list = clean_macros(macros_to_expand)
 
 # finally, write these lines back to the txt
@@ -134,7 +137,6 @@ for items in clean_macros_list:
     # modify the lines in lines_read
     lines_read[items[1] - 1] = ''.join(str(item) for item in items[0])
     lines_read[items[1] - 1] += '\n'
-
 
 # all that is left is to dump all this rubbish into a python file
 with open(target_file_dir + target_file_executables_dir + macro_file_name.split('.')[0] + '.py', 'w') as python_file:
