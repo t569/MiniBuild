@@ -16,7 +16,7 @@ def init_build_box_rule(dictionary_of_args):
 
     return replace_list
 
-
+# TODO: ADD include_obj_files field
 def compile_build_box_rule(dictionary_of_args):
     replace_list: list = []
     replace_list.append(dictionary_of_args['name'])

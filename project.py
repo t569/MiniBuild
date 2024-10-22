@@ -56,4 +56,4 @@ class Project:
 my_prj = Project('buildconfig.json', 'linkerconfig.json')
 my_prj.compile_to_object_files()
 my_prj.link_to_executable()
-# my_prj.run_executable(log_the_results=True)
+my_prj.run_executable(log_the_results=True)
