@@ -200,7 +200,7 @@ To build a dir of object files to an executable one has to invoke the linker mac
 
 ### Create a linkerconfig json file
 Create a file with any name of your choice (prefarably linkerconfig.json) and type the following:
-```json
+```JSON
 [
   {
     "build_type": "debug",
@@ -238,4 +238,71 @@ To modify the file and allow execution of the compiled executable, change the la
 ```python
 my_first_machine.compile_and_dump_exec(executeFlag=True)
 ```
+
+# The BIG IDEA: Create a Project Build Machine
+
+To create a project build machine the steps are very straight forward:
+
+## Import the project module into main.py:
+```python
+import project
+```
+
+## Create a linker config and build config json file:
+* linkerconfig.json
+```JSON
+[
+  {
+    "build_type": "debug",
+    "language": "c",
+    "command": "gcc",
+    "object_files_dir": "/target/ObjectFiles/",
+    "output_exec_dir": "/target/Executables/",
+    "external_libraries": {
+      "paths": [],
+      "libs": []
+    },
+    "results": "logs/results.json",
+    "executable_name": "default",
+    "ldflags": {
+        "debug": "-g",
+        "release": "-s"
+      }
+    }
+]
+```
+
+* buildconfig.json
+```JSON
+[
+  {
+    "command": "gcc",
+    "compile_dir_to_executable": true,
+    "file_type": "c",
+    "lazy_load": true,
+    "log_file": "logs/log.json",
+    "output_dir": "/target/",
+    "output_dir_executables": "Executables/",
+    "output_dir_objectfiles": "ObjectFiles/",
+    "recursive_compile_dir": false,
+    "result_file": "logs/results.json",
+    "source_dir": "/src/"
+  }
+]
+```
+As usual, change asper specification
+
+## Initialise a project machine in main.py
+
+```python
+myprj = Project('buildconfig.json','linkerconfig.json')
+```
+
+## Compile link and run pipeline
+```python
+myprj.compile_to_object_files()
+myprj.link_to_executable()
+myprj.run_executable(log_to_results=True)
+```
+** Note: the ```Project``` class initialises its own ```BuildMachine``` object and ```LinkerMachine``` object **
 
