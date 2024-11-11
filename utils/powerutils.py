@@ -34,23 +34,26 @@ def lazy_load_func(json_filename) -> list:
 
 
 def execute_commands(runcommands, execute, results, file_to_compile, output_bin, os_type, linkFlag=False, extra_run_args=None) -> list:
-    process = ""
+    if linkFlag:
+        process = "Linking"
+        json_attr = 'link_status'
+    else:
+        process = "Compilation"
+        json_attr = 'compile_status'
+    
     try:
         subprocess.run(runcommands, capture_output=True, text=True, check=True)
 
         message = f"{process} of {file_to_compile} successful"
-        if linkFlag:
-            process = "Linking"
-        else:
-            process = "Compilation"
+       
 
         print(f"{process} of {file_to_compile} successful")
 
         if process == "Compilation":
-            results['compile_status'] = 'success'
+            results[json_attr] = 'success'
 
         if process == "Linking":
-            results['link_status'] = 'success'
+            results[json_attr] = 'success'
 
         # output_bin = output_dir + file
 
@@ -63,12 +66,9 @@ def execute_commands(runcommands, execute, results, file_to_compile, output_bin,
             results['output'] = ''
 
     except subprocess.CalledProcessError as e:
+        # wierd way but it works idk
         print(f"Error during {process} of {file_to_compile}")
-        if process == "Compilation":
-            results['compile_status'] = 'failure'
-
-        if process == "Linking":
-            results['link_status'] = 'failure'
+        results[json_attr] = 'failure'
         # capture the error message; Error message of death!!!
         results['output'] = {"stdout": e.stdout,
                              "stderr": e.stderr}
