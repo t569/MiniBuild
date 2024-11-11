@@ -196,7 +196,42 @@ One can also build to object files using the following (note this specifies a su
     my_fourth_machine.compile_to_obj_and_dump()
 ```
 ## Build to Object Files: Linking
-coming soon....
+To build a dir of object files to an executable one has to invoke the linker machine. to do that one has to go through the following steps
+
+### Create a linkerconfig json file
+Create a file with any name of your choice (prefarably linkerconfig.json) and type the following:
+```json
+[
+  {
+    "build_type": "debug",
+    "language": "c",
+    "command": "gcc",
+    "object_files_dir": "/target/ObjectFiles/",
+    "output_exec_dir": "/target/Executables/",
+    "external_libraries": {
+      "paths": [],
+      "libs": []
+    },
+    "results": "logs/results.json",
+    "executable_name": "default",
+    "ldflags": {
+        "debug": "-g",
+        "release": "-s"
+      }
+    }
+]
+```
+change the attributes as needed. If they do not exist use the ```null``` keyword
+### Modify main.py to run linker machine
+Now open up main.py and add the following:
+```python
+import linker
+...
+...
+my_linker = LinkerMachine(path_to_config)
+my_linker.link_dir_to_exec(project_name='example',executeFlag=False) 
+```
+as usual change parameters asper specification
 
 # Execution
 To modify the file and allow execution of the compiled executable, change the last line to the following:
