@@ -134,10 +134,13 @@ class LinkerMachine:
         print(self.output_binary)
         commands = [self.command, self.ld_flag, "-o", self.output_binary]
         commands.extend(object_files)
+
+        # check if there are any library paths
         if lib_paths_flags:
             commands.extend(lib_paths_flags)
             commands.extend(lib_flags)
-
+            
+        # this is when paths are specified but no libraries are specified
         elif lib_flags:
             raise Exception("lib paths not specified")
 
